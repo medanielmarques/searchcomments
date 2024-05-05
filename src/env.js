@@ -18,7 +18,7 @@ export const env = createEnv({
 
   runtimeEnv: {
     NODE_ENV: process.env.NODE_ENV,
-    YOUTUBE_DATA_API_KEY: process.env.YOUTUBE_DATA_API,
+    YOUTUBE_DATA_API_KEY: process.env.YOUTUBE_DATA_API_KEY,
 
     NEXT_PUBLIC_POSTHOG_KEY: process.env.NEXT_PUBLIC_POSTHOG_KEY,
     NEXT_PUBLIC_POSTHOG_HOST: process.env.NEXT_PUBLIC_POSTHOG_HOST,
