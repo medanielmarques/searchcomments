@@ -33,7 +33,7 @@ async function fetchCommentsWithSearchTerm({
       part: ["snippet", "replies"],
       videoId,
       searchTerms,
-      maxResults: 7,
+      maxResults: 10,
     })
     .catch((error) => {
       console.error("Error fetching comments:", error)
@@ -52,7 +52,7 @@ type Comment = {
   }
   comment: {
     content: string
-    date: Date
+    date: string
     likes: number
     repliesCount: number
     viewCommentUrl: string
@@ -69,6 +69,7 @@ function formatComment(item) {
 
 function mapComment(item) {
   const comment = item.snippet.topLevelComment.snippet
+  const date = new Date(comment.publishedAt).toLocaleString()
 
   return {
     author: {
@@ -77,7 +78,7 @@ function mapComment(item) {
     },
     comment: {
       content: comment.textDisplay,
-      date: comment.publishedAt,
+      date,
       likes: comment.likeCount,
       repliesCount: item.snippet.totalReplyCount,
       viewCommentUrl: `https://www.youtube.com/watch?v=${comment.videoId}&lc=${item.snippet.topLevelComment.id}`,

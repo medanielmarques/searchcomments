@@ -1,4 +1,4 @@
-await import("./src/env.js");
+await import("./src/env.js")
 
 /** @type {import("next").NextConfig} */
 const config = {
@@ -29,8 +29,14 @@ const config = {
         port: "",
         pathname: "/avatars/**",
       },
+      {
+        protocol: "https",
+        hostname: "yt3.ggpht.com",
+        port: "",
+        pathname: "/**",
+      },
     ],
   },
-};
+}
 
-export default config;
+export default config

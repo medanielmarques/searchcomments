@@ -4,6 +4,8 @@ import { Input } from "@/components/ui/input"
 import { PlaceholdersAndVanishInput } from "@/components/ui/vanish-input"
 import { api } from "@/utils/api"
 import { ReloadIcon } from "@radix-ui/react-icons"
+import Image from "next/image"
+import Link from "next/link"
 import { useRouter } from "next/router"
 import { useState } from "react"
 
@@ -13,6 +15,7 @@ export default function CommentsPage() {
   const utils = api.useUtils()
 
   const [searchTerms, setSearchTerms] = useState("")
+  const [showComments, setShowComments] = useState(false)
 
   const { data, isLoading } = api.fetchComments.newShit.useQuery(
     {
@@ -53,6 +56,8 @@ export default function CommentsPage() {
                   videoId: typeof videoId === "string" ? videoId : "",
                   searchTerms,
                 }))
+
+              setShowComments(true)
             }}
           >
             {isLoading ? (
@@ -62,6 +67,42 @@ export default function CommentsPage() {
             )}
           </Button>
         </div>
+
+        {showComments && (
+          <div className="flex flex-col gap-8">
+            {data?.comments.map((comment, i) => (
+              <div key={i} className="flex gap-4">
+                <div className="flex items-start">
+                  <Image
+                    className="rounded-full"
+                    src={comment.author.photo}
+                    width={40}
+                    height={40}
+                    alt="Comments"
+                  />
+                </div>
+
+                <div className="flex flex-col gap-2">
+                  <p>{comment.author.name}</p>
+                  <p>{comment.comment.content}</p>
+
+                  <div className="flex items-center gap-2 text-xs text-blue-600">
+                    <Link target="_blank" href={comment.comment.viewCommentUrl}>
+                      Go to comment
+                    </Link>
+                    |
+                    <p>
+                      {comment.comment.likes}{" "}
+                      {comment.comment.likes === 1 ? "like" : "likes"}
+                    </p>
+                    |<p>{comment.comment.repliesCount} replies</p>|
+                    <p>{comment.comment.date}</p>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
       </main>
     </GridBackground>
   )
