@@ -7,8 +7,54 @@ const youtube = google.youtube({
   auth: process.env.YOUTUBE_DATA_API_KEY,
 })
 
-export const fetchCommentsRouter = createTRPCRouter({
-  newShit: publicProcedure
+async function fetchVideoInfo(videoId: string) {
+  const response = await youtube.videos
+    .list({
+      part: ["snippet", "statistics"],
+      id: videoId,
+    })
+    .catch((error) => {
+      console.error("Error fetching video information:", error)
+      return null
+    })
+
+  if (response.data.items.length === 0) {
+    throw new Error("Video not found")
+  }
+
+  const video = response.data.items[0]
+
+  const title = video.snippet.title
+  const channelName = video.snippet.channelTitle
+  const thumbnail = video.snippet.thumbnails.maxres
+    ? video.snippet.thumbnails.maxres.url
+    : video.snippet.thumbnails.high.url
+  const commentCount = formatCount(video.statistics.commentCount)
+  const likeCount = formatCount(video.statistics.likeCount)
+  const viewCount = formatCount(video.statistics.viewCount)
+  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`
+
+  return {
+    title,
+    channelName,
+    thumbnail,
+    commentCount,
+    likeCount,
+    viewCount,
+    videoUrl,
+  } as {
+    title: string
+    channelName: string
+    thumbnail: string
+    commentCount: string
+    likeCount: string
+    viewCount: string
+    videoUrl: string
+  }
+}
+
+export const videoRouter = createTRPCRouter({
+  fetchComments: publicProcedure
     .input(z.object({ videoId: z.string(), searchTerms: z.string() }))
     .query(async ({ input }) => {
       const commentsResponse = await fetchCommentsWithSearchTerm(input)
@@ -18,6 +64,14 @@ export const fetchCommentsRouter = createTRPCRouter({
       )
 
       return { comments }
+    }),
+
+  fetchVideoInfo: publicProcedure
+    .input(z.object({ videoId: z.string() }))
+    .query(async ({ input }) => {
+      const video = await fetchVideoInfo(input.videoId)
+
+      return video
     }),
 })
 
@@ -53,8 +107,8 @@ type Comment = {
   comment: {
     content: string
     date: string
-    likes: number
-    repliesCount: number
+    likes: string
+    repliesCount: string
     viewCommentUrl: string
   }
   replies: Reply[]
@@ -69,7 +123,7 @@ function formatComment(item) {
 
 function mapComment(item) {
   const comment = item.snippet.topLevelComment.snippet
-  const date = new Date(comment.publishedAt).toLocaleString()
+  const date = new Date(comment.publishedAt).toLocaleDateString()
 
   return {
     author: {
@@ -79,8 +133,8 @@ function mapComment(item) {
     comment: {
       content: comment.textDisplay,
       date,
-      likes: comment.likeCount,
-      repliesCount: item.snippet.totalReplyCount,
+      likes: formatCount(comment.likeCount),
+      repliesCount: formatCount(item.snippet.totalReplyCount),
       viewCommentUrl: `https://www.youtube.com/watch?v=${comment.videoId}&lc=${item.snippet.topLevelComment.id}`,
     },
   }
@@ -99,10 +153,19 @@ function mapReplies(item) {
           comment: {
             content: reply.textDisplay,
             date: reply.publishedAt,
-            likes: reply.likeCount,
+            likes: formatCount(reply.likeCount),
             viewCommentUrl: `https://www.youtube.com/watch?v=${reply.videoId}&lc=${item.id}`,
           },
         }
       })
     : []
+}
+
+function formatCount(count: string) {
+  const number = parseInt(count)
+
+  if (number >= 1_000_000_000) return (number / 1_000_000_000).toFixed(1) + "B"
+  if (number >= 1_000_000) return (number / 1_000_000).toFixed(1) + "M"
+  if (number >= 1_000) return (number / 1_000).toFixed(1) + "K"
+  return count
 }
