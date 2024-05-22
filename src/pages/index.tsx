@@ -12,34 +12,38 @@ import {
   useVideoUrl,
 } from "@/lib/video-store"
 import { api } from "@/utils/api"
-import { ReloadIcon } from "@radix-ui/react-icons"
+import { MagnifyingGlassIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { formatDistanceStrict } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
 
 export default function Home() {
-  const { video, isLoadingVideo } = useVideo()
+  const { video } = useVideo()
   const showComments = useShowComments()
 
   return (
     <div className="relative flex w-full items-center justify-center bg-white">
-      <div className="flex flex-col items-center justify-between gap-16 py-8 pl-8">
+      <div className="flex flex-col items-center justify-between py-8 md:gap-16">
         <Header />
 
-        <main className="flex w-5/6 max-w-4xl flex-col items-center gap-8 py-8 md:py-0">
+        <main className="flex w-11/12 max-w-sm flex-col justify-center gap-8 py-8 md:w-screen md:max-w-2xl md:py-0 lg:max-w-2xl">
           <div className="flex w-full flex-col gap-6">
-            <div className="flex flex-col items-center gap-4">
+            <div className="flex flex-col items-center gap-6">
               <Video />
-              <Separator />
-              {!isLoadingVideo && video && <SearchComments />}
+              {video && (
+                <>
+                  <Separator />
+                  <SearchComments />
+                </>
+              )}
             </div>
-            <SearchSuggestions />
+            {video && <SearchSuggestions />}
           </div>
 
           {showComments && <Comments />}
         </main>
 
-        <Footer />
+        {video && <Footer />}
       </div>
     </div>
   )
@@ -48,7 +52,7 @@ export default function Home() {
 function Header() {
   return (
     <header className="flex items-center justify-start">
-      <p className="relative z-20 max-w-lg bg-gradient-to-b from-gray-800 to-gray-800 bg-clip-text text-center text-3xl font-bold text-transparent sm:text-4xl">
+      <p className="relative z-20 bg-gradient-to-b from-gray-800 to-gray-800 bg-clip-text text-center text-2xl font-bold text-transparent sm:text-4xl">
         search
         <span className="mx-[2px] rounded-md bg-gray-800 px-2 text-white">
           comments
@@ -82,30 +86,29 @@ function Video() {
   const utils = api.useUtils()
 
   return (
-    <div>
-      <span className="text-lg font-medium">Video</span>
+    <div className="flex w-full flex-col gap-6 rounded-lg">
+      <div className="flex flex-col items-center gap-4 md:flex-row md:gap-2">
+        <div className="relative w-full">
+          <Input
+            type="text"
+            placeholder="Video URL"
+            value={videoUrl}
+            onChange={(e) => videoActions.setVideoUrl(e.target.value)}
+          />
 
-      <div className="flex w-full flex-col items-center gap-4 md:flex-row md:gap-2">
-        <Input
-          className="w-full bg-white"
-          type="text"
-          placeholder="Video URL"
-          value={videoUrl}
-          onChange={(e) => videoActions.setVideoUrl(e.target.value)}
-        />
-
-        <Button
-          onClick={async () => {
-            await utils.videoRouter.fetchVideoInfo.fetch({ videoId })
-          }}
-          className="w-full bg-gray-800 hover:bg-gray-800 md:w-36"
-        >
-          {isLoadingVideo ? (
-            <ReloadIcon className="h-4 w-4 animate-spin" />
-          ) : (
-            "Load video"
-          )}
-        </Button>
+          <div
+            className="absolute right-0 top-0 rounded-md bg-gray-100 hover:cursor-pointer hover:bg-gray-200 md:bg-inherit"
+            onClick={async () => {
+              await utils.videoRouter.fetchVideoInfo.fetch({ videoId })
+            }}
+          >
+            {isLoadingVideo ? (
+              <ReloadIcon className="m-2.5 h-4 w-4 animate-spin" />
+            ) : (
+              <MagnifyingGlassIcon className="m-2.5 h-4 w-4 text-muted-foreground" />
+            )}
+          </div>
+        </div>
       </div>
 
       {!isLoadingVideo && video && (
@@ -154,32 +157,33 @@ function SearchComments() {
 
   return (
     <div className="flex w-full flex-col items-center gap-4 md:flex-row md:gap-2">
-      <Input
-        className="w-full bg-white"
-        type="text"
-        onChange={(e) => videoActions.setSearchTerms(e.target.value)}
-        placeholder="Search the comments"
-        value={searchTerms}
-      />
+      <div className="relative w-full">
+        <Input
+          className="w-full bg-white"
+          type="text"
+          onChange={(e) => videoActions.setSearchTerms(e.target.value)}
+          placeholder="Search the comments"
+          value={searchTerms}
+        />
 
-      <Button
-        className="w-full bg-gray-800 hover:bg-gray-800 md:w-36"
-        disabled={isLoadingComments}
-        onClick={async () => {
-          await utils.videoRouter.fetchComments.fetch({
-            videoId,
-            searchTerms,
-          })
+        <div
+          className="absolute right-0 top-0 rounded-md bg-gray-100 hover:cursor-pointer hover:bg-gray-200 md:bg-inherit"
+          onClick={async () => {
+            await utils.videoRouter.fetchComments.fetch({
+              videoId,
+              searchTerms,
+            })
 
-          videoActions.setShowComments(true)
-        }}
-      >
-        {isLoadingComments ? (
-          <ReloadIcon className="h-4 w-4 animate-spin" />
-        ) : (
-          "Search"
-        )}
-      </Button>
+            videoActions.setShowComments(true)
+          }}
+        >
+          {isLoadingComments ? (
+            <ReloadIcon className="m-2.5 h-4 w-4 animate-spin" />
+          ) : (
+            <MagnifyingGlassIcon className="m-2.5 h-4 w-4 text-muted-foreground" />
+          )}
+        </div>
+      </div>
     </div>
   )
 }
@@ -192,7 +196,7 @@ function SearchSuggestions() {
   const utils = api.useUtils()
 
   return (
-    <div className="flex items-center gap-3">
+    <div className="flex flex-wrap items-center gap-3">
       {searchSuggestions.map(({ suggestion, selected }) => (
         <Button
           className={`h-8 rounded-lg ${selected ? "bg-black text-white hover:bg-primary/90" : "bg-zinc-100"} text-sm font-semibold hover:bg-zinc-200`}
@@ -232,8 +236,6 @@ function Comments() {
 
   return (
     <div className="flex flex-col gap-6">
-      <Separator />
-
       <span className="text-lg font-medium">
         Comments found ({comments?.length})
       </span>
