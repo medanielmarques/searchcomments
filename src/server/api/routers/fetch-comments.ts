@@ -7,6 +7,16 @@ const youtube = google.youtube({
   auth: process.env.YOUTUBE_DATA_API_KEY,
 })
 
+export type Video = {
+  title: string
+  channelName: string
+  thumbnail: string
+  commentCount: string
+  likeCount: string
+  viewCount: string
+  videoUrl: string
+}
+
 async function fetchVideoInfo(videoId: string) {
   const response = await youtube.videos
     .list({
@@ -42,15 +52,7 @@ async function fetchVideoInfo(videoId: string) {
     likeCount,
     viewCount,
     videoUrl,
-  } as {
-    title: string
-    channelName: string
-    thumbnail: string
-    commentCount: string
-    likeCount: string
-    viewCount: string
-    videoUrl: string
-  }
+  } as Video
 }
 
 export const videoRouter = createTRPCRouter({
@@ -99,7 +101,7 @@ async function fetchCommentsWithSearchTerm({
 
 type Reply = Omit<Comment, "replies">
 
-type Comment = {
+export type Comment = {
   author: {
     name: string
     photo: string
