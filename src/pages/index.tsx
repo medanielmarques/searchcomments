@@ -85,6 +85,13 @@ function Video() {
   const videoId = useVideoId()
   const utils = api.useUtils()
 
+  async function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter") {
+      event.preventDefault()
+      await utils.videoRouter.fetchVideoInfo.fetch({ videoId })
+    }
+  }
+
   return (
     <div className="flex w-full flex-col gap-6 rounded-lg">
       <div className="flex flex-col items-center gap-4 md:flex-row md:gap-2">
@@ -92,6 +99,7 @@ function Video() {
           <Input
             type="text"
             placeholder="Video URL"
+            onKeyDown={handleKeyDown}
             value={videoUrl}
             onChange={(e) => videoActions.setVideoUrl(e.target.value)}
           />
@@ -155,6 +163,19 @@ function SearchComments() {
   const videoId = useVideoId()
   const utils = api.useUtils()
 
+  async function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter") {
+      event.preventDefault()
+
+      await utils.videoRouter.fetchComments.fetch({
+        videoId,
+        searchTerms,
+      })
+
+      videoActions.setShowComments(true)
+    }
+  }
+
   return (
     <div className="flex w-full flex-col items-center gap-4 md:flex-row md:gap-2">
       <div className="relative w-full">
@@ -162,6 +183,7 @@ function SearchComments() {
           className="w-full bg-white"
           type="text"
           onChange={(e) => videoActions.setSearchTerms(e.target.value)}
+          onKeyDown={handleKeyDown}
           placeholder="Search the comments"
           value={searchTerms}
         />
