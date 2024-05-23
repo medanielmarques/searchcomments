@@ -65,7 +65,7 @@ function Header() {
 
 function Footer() {
   return (
-    <footer>
+    <footer className="flex flex-col items-center gap-4">
       <Link href="https://ko-fi.com/danielmarques" target="_blank">
         <Image
           src="/buy-me-a-coffee.jpg"
@@ -73,6 +73,30 @@ function Footer() {
           width={220}
           height={80}
         />
+      </Link>
+
+      <Link
+        href="https://x.com/medanielmarques"
+        target="_blank"
+        rel="noreferrer"
+        className="animate-fade-up mx-auto mb-5 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-gray-200 bg-gray-100 px-7 py-2 transition-colors hover:bg-gray-50"
+      >
+        <svg
+          width="300"
+          height="300"
+          viewBox="0 0 300 300"
+          version="1.1"
+          xmlns="http://www.w3.org/2000/svg"
+          className="h-4 w-4 p-px text-gray-600"
+        >
+          <path
+            stroke="currentColor"
+            d="M178.57 127.15 290.27 0h-26.46l-97.03 110.38L89.34 0H0l117.13 166.93L0 300.25h26.46l102.4-116.59 81.8 116.59h89.34M36.01 19.54H76.66l187.13 262.13h-40.66"
+          />
+        </svg>
+        <p className="text-sm font-semibold text-gray-600">
+          Follow me on twitter
+        </p>
       </Link>
     </footer>
   )
