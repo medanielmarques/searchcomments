@@ -1,4 +1,5 @@
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc"
+import { TRPCError } from "@trpc/server"
 import { google } from "googleapis"
 import { z } from "zod"
 
@@ -29,7 +30,7 @@ async function fetchVideoInfo(videoId: string) {
     })
 
   if (response.data.items.length === 0) {
-    throw new Error("Video not found")
+    throw new TRPCError({ code: "NOT_FOUND", message: "Video not found" })
   }
 
   const video = response.data.items[0]

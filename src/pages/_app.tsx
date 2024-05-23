@@ -1,3 +1,4 @@
+import { Toaster } from "@/components/ui/toaster"
 import { api } from "@/utils/api"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 // import { supabase } from "@/utils/supabase";
@@ -43,6 +44,8 @@ const MyApp: AppType = ({ Component, pageProps }) => {
       <main className={montserrat.className}>
         {/* <SessionContextProvider supabaseClient={supabase}> */}
         <Component {...pageProps} />
+        <Toaster />
+
         {/* </SessionContextProvider> */}
       </main>
     </PostHogProvider>

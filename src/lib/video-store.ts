@@ -1,5 +1,7 @@
+import { useToast } from "@/components/ui/use-toast"
 import { type Comment, type Video } from "@/server/api/routers/fetch-comments"
 import { api } from "@/utils/api"
+import { useEffect } from "react"
 import { create } from "zustand"
 
 type Suggestion = {
@@ -71,14 +73,25 @@ export function useVideoId() {
 
 export const useVideo = () => {
   const videoId = useVideoId()
+  const { toast } = useToast()
 
   const {
     data: video,
     isLoading: isLoadingVideo,
     error: errorVideo,
+    isError: isErrorVideo,
   } = api.videoRouter.fetchVideoInfo.useQuery({ videoId }, { enabled: false })
 
-  return { video, isLoadingVideo, errorVideo }
+  useEffect(() => {
+    if (isErrorVideo) {
+      toast({
+        title: errorVideo.message,
+        description: "Please provide a valid URL",
+      })
+    }
+  }, [isErrorVideo, errorVideo, toast])
+
+  return { video, isLoadingVideo, errorVideo, isErrorVideo }
 }
 
 export const useComments = () => {
