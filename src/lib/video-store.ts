@@ -15,7 +15,6 @@ type VideoStore = {
 
   videoUrl: string
   searchTerms: string
-  showComments: boolean
   searchSuggestions: Suggestion[]
 
   actions: {
@@ -23,7 +22,6 @@ type VideoStore = {
     setComments: (comments: Comment[]) => void
     setVideoUrl: (videoUrl: string) => void
     setSearchTerms: (searchTerms: string) => void
-    setShowComments: (showComments: boolean) => void
     setSearchSuggestions: (searchSuggestions: Suggestion[]) => void
   }
 }
@@ -51,7 +49,6 @@ const useVideoStore = create<VideoStore>((set) => ({
 
   videoUrl: "",
   searchTerms: "",
-  showComments: false,
   searchSuggestions,
 
   actions: {
@@ -59,7 +56,6 @@ const useVideoStore = create<VideoStore>((set) => ({
     setComments: (comments) => set({ comments }),
     setVideoUrl: (videoUrl) => set({ videoUrl }),
     setSearchTerms: (searchTerms) => set({ searchTerms }),
-    setShowComments: (showComments) => set({ showComments }),
     setSearchSuggestions: (searchSuggestions) => set({ searchSuggestions }),
   },
 }))
@@ -115,9 +111,6 @@ export const useComments = () => {
 export const useVideoUrl = () => useVideoStore((state) => state.videoUrl)
 
 export const useSearchTerms = () => useVideoStore((state) => state.searchTerms)
-
-export const useShowComments = () =>
-  useVideoStore((state) => state.showComments)
 
 export const useSearchSuggestions = () =>
   useVideoStore((state) => state.searchSuggestions)

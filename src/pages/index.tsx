@@ -1,12 +1,12 @@
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import { captureEvent } from "@/lib/analytics"
 import {
   useActions,
   useComments,
   useSearchSuggestions,
   useSearchTerms,
-  useShowComments,
   useVideo,
   useVideoId,
   useVideoUrl,
@@ -19,7 +19,7 @@ import Link from "next/link"
 
 export default function Home() {
   const { video } = useVideo()
-  const showComments = useShowComments()
+  const { comments } = useComments()
 
   return (
     <div className="relative flex w-full items-center justify-center bg-white">
@@ -40,7 +40,7 @@ export default function Home() {
             {video && <SearchSuggestions />}
           </div>
 
-          {showComments && <Comments />}
+          {comments && <Comments />}
         </main>
 
         {video && <Footer />}
@@ -66,7 +66,11 @@ function Header() {
 function Footer() {
   return (
     <footer className="flex flex-col items-center gap-4">
-      <Link href="https://ko-fi.com/danielmarques" target="_blank">
+      <Link
+        onClick={() => captureEvent("Ko-fi")}
+        href="https://dub.sh/danielkofi"
+        target="_blank"
+      >
         <Image
           src="/buy-me-a-coffee.jpg"
           alt="Buy me a coffee"
@@ -76,7 +80,8 @@ function Footer() {
       </Link>
 
       <Link
-        href="https://x.com/medanielmarques"
+        onClick={() => captureEvent("Follow me on twitter")}
+        href="https://dub.sh/danielx"
         target="_blank"
         rel="noreferrer"
         className="animate-fade-up mx-auto mb-5 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-gray-200 bg-gray-100 px-7 py-2 transition-colors hover:bg-gray-50"
@@ -181,10 +186,12 @@ function Video() {
 }
 
 function SearchComments() {
+  const { video } = useVideo()
   const { isLoadingComments } = useComments()
   const searchTerms = useSearchTerms()
   const videoActions = useActions()
   const videoId = useVideoId()
+  const videoUrl = useVideoUrl()
   const utils = api.useUtils()
 
   async function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -195,8 +202,6 @@ function SearchComments() {
         videoId,
         searchTerms,
       })
-
-      videoActions.setShowComments(true)
     }
   }
 
@@ -220,7 +225,11 @@ function SearchComments() {
               searchTerms,
             })
 
-            videoActions.setShowComments(true)
+            captureEvent("Video info + search term", {
+              videoTitle: video?.title,
+              videoUrl,
+              searchTerms,
+            })
           }}
         >
           {isLoadingComments ? (
@@ -235,9 +244,11 @@ function SearchComments() {
 }
 
 function SearchSuggestions() {
+  const { video } = useVideo()
   const searchSuggestions = useSearchSuggestions()
   const searchTerms = useSearchTerms()
   const videoId = useVideoId()
+  const videoUrl = useVideoUrl()
   const videoActions = useActions()
   const utils = api.useUtils()
 
@@ -254,8 +265,6 @@ function SearchSuggestions() {
               searchTerms,
             })
 
-            videoActions.setShowComments(true)
-
             const newSuggestions = searchSuggestions.map((s) => {
               s.suggestion === suggestion &&
                 videoActions.setSearchTerms(s.selected ? "" : s.suggestion)
@@ -267,6 +276,13 @@ function SearchSuggestions() {
             })
 
             videoActions.setSearchSuggestions(newSuggestions)
+
+            captureEvent("Search suggestions", {
+              videoTitle: video?.title,
+              videoUrl,
+              searchTerms,
+              suggestion,
+            })
           }}
         >
           {suggestion}
