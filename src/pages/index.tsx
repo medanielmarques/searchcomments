@@ -355,15 +355,17 @@ const highlightText = (text: string, phrase: string) => {
   const words = phrase.split(" ").filter((word) => word)
   const regex = new RegExp(`\\b(${words.join("|")})\\b`, "gi")
 
-  return text.split(regex).map((part, index) =>
-    words.includes(part.toLowerCase()) ? (
+  return text.split(regex).map((part, index) => {
+    const lowerCasePart = part.toLowerCase()
+    const lowerCaseWords = words.map((word) => word.toLowerCase())
+    return lowerCaseWords.includes(lowerCasePart) ? (
       <span key={index} className="rounded-md bg-yellow-300 p-1 font-medium">
         {part}
       </span>
     ) : (
       part
-    ),
-  )
+    )
+  })
 }
 
 function HighlightText({
