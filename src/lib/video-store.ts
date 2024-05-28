@@ -12,6 +12,7 @@ type Suggestion = {
 type VideoStore = {
   video: Video
   comments: Comment[]
+  commentId: string
 
   videoUrl: string
   searchTerms: string
@@ -20,6 +21,8 @@ type VideoStore = {
   actions: {
     setVideo: (video: Video) => void
     setComments: (comments: Comment[]) => void
+    setcommentId: (commentId: string) => void
+
     setVideoUrl: (videoUrl: string) => void
     setSearchTerms: (searchTerms: string) => void
     setSearchSuggestions: (searchSuggestions: Suggestion[]) => void
@@ -46,6 +49,7 @@ const useVideoStore = create<VideoStore>((set) => ({
     videoUrl: "",
   },
   comments: [],
+  commentId: "",
 
   videoUrl: "",
   searchTerms: "",
@@ -54,6 +58,7 @@ const useVideoStore = create<VideoStore>((set) => ({
   actions: {
     setVideo: (video) => set({ video }),
     setComments: (comments) => set({ comments }),
+    setcommentId: (commentId) => set({ commentId }),
     setVideoUrl: (videoUrl) => set({ videoUrl }),
     setSearchTerms: (searchTerms) => set({ searchTerms }),
     setSearchSuggestions: (searchSuggestions) => set({ searchSuggestions }),
@@ -107,6 +112,25 @@ export const useComments = () => {
 
   return { comments, isLoadingComments, errorComments }
 }
+
+export const useReplies = () => {
+  const commentId = useCommentId()
+
+  const {
+    data,
+    isLoading: isLoadingReplies,
+    error: errorReplies,
+  } = api.videoRouter.fetchComments.useQuery(
+    { commentId: [commentId], searchTerms: "" },
+    { enabled: false },
+  )
+
+  const replies = data?.comments[0]?.replies
+
+  return { replies, isLoadingReplies, errorReplies }
+}
+
+export const useCommentId = () => useVideoStore((state) => state.commentId)
 
 export const useVideoUrl = () => useVideoStore((state) => state.videoUrl)
 

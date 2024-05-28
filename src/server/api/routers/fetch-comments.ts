@@ -58,7 +58,13 @@ async function fetchVideoInfo(videoId: string) {
 
 export const videoRouter = createTRPCRouter({
   fetchComments: publicProcedure
-    .input(z.object({ videoId: z.string(), searchTerms: z.string() }))
+    .input(
+      z.object({
+        videoId: z.string().optional(),
+        searchTerms: z.string(),
+        commentId: z.string().array().optional(),
+      }),
+    )
     .query(async ({ input }) => {
       const commentsResponse = await fetchCommentsWithSearchTerm(input)
 
@@ -81,16 +87,19 @@ export const videoRouter = createTRPCRouter({
 async function fetchCommentsWithSearchTerm({
   videoId,
   searchTerms,
+  commentId,
 }: {
-  videoId: string
+  commentId?: string[] | undefined
+  videoId?: string
   searchTerms: string
 }) {
   const response = await youtube.commentThreads
     .list({
       part: ["snippet", "replies"],
       videoId,
+      id: commentId,
       searchTerms,
-      maxResults: 10,
+      maxResults: 50,
     })
     .catch((error) => {
       console.error("Error fetching comments:", error)
@@ -108,10 +117,11 @@ export type Comment = {
     photo: string
   }
   comment: {
+    id: string
     content: string
     date: string
     likes: string
-    repliesCount: string
+    repliesCount: number
     viewCommentUrl: string
   }
   replies: Reply[]
@@ -134,10 +144,11 @@ function mapComment(item) {
       photo: comment.authorProfileImageUrl,
     },
     comment: {
+      id: item.snippet.topLevelComment.id,
       content: comment.textDisplay,
       date,
       likes: formatCount(comment.likeCount),
-      repliesCount: formatCount(item.snippet.totalReplyCount),
+      repliesCount: item.snippet.totalReplyCount,
       viewCommentUrl: `https://www.youtube.com/watch?v=${comment.videoId}&lc=${item.snippet.topLevelComment.id}`,
     },
   }
@@ -154,6 +165,7 @@ function mapReplies(item) {
             photo: reply.authorProfileImageUrl,
           },
           comment: {
+            id: item.id,
             content: reply.textDisplay,
             date: reply.publishedAt,
             likes: formatCount(reply.likeCount),

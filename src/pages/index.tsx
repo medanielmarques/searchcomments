@@ -4,18 +4,22 @@ import { Separator } from "@/components/ui/separator"
 import { captureEvent } from "@/lib/analytics"
 import {
   useActions,
+  useCommentId,
   useComments,
+  useReplies,
   useSearchSuggestions,
   useSearchTerms,
   useVideo,
   useVideoId,
   useVideoUrl,
 } from "@/lib/video-store"
+import { type Comment } from "@/server/api/routers/fetch-comments"
 import { api } from "@/utils/api"
 import { MagnifyingGlassIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { formatDistanceStrict } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
+import { useState } from "react"
 
 export default function Home() {
   const { video } = useVideo()
@@ -40,7 +44,7 @@ export default function Home() {
             {video && <SearchSuggestions />}
           </div>
 
-          {comments && <Comments />}
+          {comments && <Comments comments={comments} />}
         </main>
 
         {video && <Footer />}
@@ -292,65 +296,114 @@ function SearchSuggestions() {
   )
 }
 
-function Comments() {
-  const { comments } = useComments()
-  const searchTerms = useSearchTerms()
-
+function Comments({
+  comments,
+  isReplies = false,
+}: {
+  comments: Comment[]
+  isReplies?: boolean
+}) {
   return (
     <div className="flex flex-col gap-6">
-      <span className="text-lg font-medium">
-        Comments found ({comments?.length})
-      </span>
+      {!isReplies && (
+        <span className="text-lg font-medium">
+          Comments found ({comments?.length})
+        </span>
+      )}
 
       <div className="flex flex-col gap-8">
-        {comments?.map((comment, i) => (
-          <div key={i} className="flex gap-4">
-            <div className="flex items-start">
-              <Image
-                className="rounded-full"
-                src={comment.author.photo}
-                width={40}
-                height={40}
-                alt="Comments"
-              />
-            </div>
-
-            <div className="flex w-full flex-col gap-2">
-              <div className="flex items-center gap-2">
-                <span>{comment.author.name}</span>
-                <span className="text-xs">
-                  {formatDistanceStrict(
-                    new Date(comment.comment.date),
-                    new Date(),
-                    { addSuffix: true },
-                  )}
-                </span>
-              </div>
-              <div>
-                <HighlightText
-                  text={comment.comment.content}
-                  wordsToHighlight={searchTerms}
-                />
-              </div>
-              <div className="flex items-center gap-2 text-xs text-blue-600">
-                <p>
-                  {comment.comment.likes}{" "}
-                  {parseInt(comment.comment.likes) === 1 ? "like" : "likes"}
-                </p>
-                |<p>{comment.comment.repliesCount} replies</p>|
-                <Link target="_blank" href={comment.comment.viewCommentUrl}>
-                  Go to comment
-                </Link>
-              </div>
-            </div>
-          </div>
-        ))}
+        {comments?.map((comment) => {
+          return <Comment key={comment.comment.id} comment={comment} />
+        })}
       </div>
     </div>
   )
 }
 
-const highlightText = (text: string, phrase: string) => {
+function Comment({ comment }: { comment: Comment }) {
+  const { replies } = useReplies()
+  const searchTerms = useSearchTerms()
+  const videoActions = useActions()
+  const [showReplies, setShowReplies] = useState(false)
+  const commentId = useCommentId()
+  const utils = api.useUtils()
+
+  return (
+    <div>
+      <div className="flex gap-4">
+        <div className="flex items-start">
+          <Image
+            className="rounded-full"
+            src={comment.author.photo}
+            width={40}
+            height={40}
+            alt="Comments"
+          />
+        </div>
+
+        <div className="flex w-full flex-col gap-2">
+          <div className="flex items-center gap-2">
+            <span>{comment.author.name}</span>
+            <span className="text-xs">
+              {formatDistanceStrict(
+                new Date(comment.comment.date),
+                new Date(),
+                { addSuffix: true },
+              )}
+            </span>
+          </div>
+          <div>
+            <HighlightText
+              text={comment.comment.content}
+              wordsToHighlight={searchTerms}
+            />
+          </div>
+          <div className="flex items-center gap-2 text-xs text-blue-600">
+            <p>
+              {comment.comment.likes}{" "}
+              {parseInt(comment.comment.likes) === 1 ? "like" : "likes"}
+            </p>
+            |
+            <Link target="_blank" href={comment.comment.viewCommentUrl}>
+              Go to comment
+            </Link>
+            {comment.comment.repliesCount > 0 && (
+              <>
+                |
+                <div
+                  className="hover:cursor-pointer"
+                  onClick={async () => {
+                    videoActions.setcommentId(comment.comment.id)
+                    setShowReplies(!showReplies)
+
+                    if (showReplies) return
+
+                    await utils.videoRouter.fetchComments.fetch({
+                      commentId: [comment.comment.id],
+                      searchTerms: "",
+                    })
+                  }}
+                >
+                  <p>
+                    {showReplies ? "Hide" : "Show"} replies (
+                    {comment.comment.repliesCount})
+                  </p>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+      {comment.comment.id === commentId && showReplies && (
+        <div className="ml-14 mt-6">
+          <Comments comments={replies} isReplies />
+        </div>
+      )}
+    </div>
+  )
+}
+
+function highlightText(text: string, phrase: string) {
   if (!phrase) return text
   const words = phrase.split(" ").filter((word) => word)
   const regex = new RegExp(`\\b(${words.join("|")})\\b`, "gi")
