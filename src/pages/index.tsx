@@ -86,7 +86,7 @@ function Header() {
         <span className="text-sm sm:text-xl">.com</span>
       </p>
 
-      <div className="flex items-center gap-2 sm:gap-4">
+      <div className="flex items-center gap-2 sm:gap-3">
         <Link
           className="inline-flex h-9 items-center space-x-2 rounded-md bg-yellow-300 px-3 py-2 text-gray-900 transition-colors hover:bg-yellow-400"
           onClick={() => captureEvent("Ko-fi")}
@@ -123,7 +123,7 @@ function Header() {
 
         <Link
           onClick={() => captureEvent("Insigh.to")}
-          href="https://dub.sh/daniel-insighto"
+          href="https://app.searchcomments.com/feature"
           target="_blank"
           className="hidden h-9 items-center space-x-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-black transition-colors hover:bg-gray-100 sm:block"
         >
@@ -132,7 +132,7 @@ function Header() {
 
         <Link
           onClick={() => captureEvent("Insigh.to")}
-          href="https://dub.sh/daniel-insighto"
+          href="https://app.searchcomments.com/feature"
           target="_blank"
           className="sm:hidden"
         >
