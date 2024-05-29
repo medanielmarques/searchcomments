@@ -94,9 +94,6 @@ function Header() {
           target="_blank"
         >
           <CoffeeIcon />
-          <span className="hidden text-sm font-semibold sm:block">
-            Buy Me a Coffee
-          </span>
         </Link>
 
         <Link
@@ -122,7 +119,30 @@ function Header() {
               d="M403.229 0h78.506L310.219 196.04 512 462.799H354.002L230.261 301.007 88.669 462.799h-78.56l183.455-209.683L0 0h161.999l111.856 147.88L403.229 0zm-27.556 415.805h43.505L138.363 44.527h-46.68l283.99 371.278z"
             />
           </svg>
-          <span className="hidden text-sm font-semibold sm:block">Twitter</span>
+        </Link>
+
+        <Link
+          onClick={() => captureEvent("Insigh.to")}
+          href="https://dub.sh/daniel-insighto"
+          target="_blank"
+          className="hidden h-9 items-center space-x-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-black transition-colors hover:bg-gray-100 sm:block"
+        >
+          Request a feature
+        </Link>
+
+        <Link
+          onClick={() => captureEvent("Insigh.to")}
+          href="https://dub.sh/daniel-insighto"
+          target="_blank"
+          className="sm:hidden"
+        >
+          <Image
+            className="rounded-md"
+            src="/insighto.png"
+            width={36}
+            height={36}
+            alt="Request a feature"
+          />
         </Link>
       </div>
     </header>
