@@ -26,88 +26,106 @@ export default function Home() {
   const { comments } = useComments()
 
   return (
-    <div className="relative flex w-full items-center justify-center bg-white">
-      <div className="flex flex-col items-center justify-between py-8 md:gap-16">
+    <>
+      <div className="flex items-center justify-center">
         <Header />
-
-        <main className="flex w-11/12 max-w-sm flex-col justify-center gap-8 py-8 md:w-screen md:max-w-2xl md:py-0 lg:max-w-2xl">
-          <div className="flex w-full flex-col gap-6">
-            <div className="flex flex-col items-center gap-6">
-              <Video />
-              {video && (
-                <>
-                  <Separator />
-                  <SearchComments />
-                </>
-              )}
-            </div>
-            {video && <SearchSuggestions />}
-          </div>
-
-          {comments && <Comments comments={comments} />}
-        </main>
-
-        {video && <Footer />}
       </div>
-    </div>
+      <div className="relative flex w-full items-center justify-center bg-white">
+        <div className="flex flex-col items-center justify-between py-8 md:gap-16">
+          <main className="flex w-11/12 max-w-sm flex-col justify-center gap-8 py-8 md:w-screen md:max-w-2xl md:py-0 lg:max-w-2xl">
+            <div className="flex w-full flex-col gap-6">
+              <div className="flex flex-col items-center gap-6">
+                <Video />
+                {video && (
+                  <>
+                    <Separator />
+                    <SearchComments />
+                  </>
+                )}
+              </div>
+              {video && <SearchSuggestions />}
+            </div>
+
+            {comments && <Comments comments={comments} />}
+          </main>
+        </div>
+      </div>
+    </>
+  )
+}
+
+function CoffeeIcon() {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="20"
+      height="20"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <path d="M10 2v2" />
+      <path d="M14 2v2" />
+      <path d="M16 8a1 1 0 0 1 1 1v8a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4V9a1 1 0 0 1 1-1h14a4 4 0 1 1 0 8h-1" />
+      <path d="M6 2v2" />
+    </svg>
   )
 }
 
 function Header() {
   return (
-    <header className="flex items-center justify-start">
-      <p className="relative z-20 bg-gradient-to-b from-gray-800 to-gray-800 bg-clip-text text-center text-2xl font-bold text-transparent sm:text-4xl">
+    <header className="flex w-full max-w-2xl items-center justify-between px-2 py-2 sm:px-0">
+      <p className="relative z-20 bg-gradient-to-b from-gray-800 to-gray-800 bg-clip-text text-center font-bold text-transparent sm:text-2xl">
         search
         <span className="mx-[2px] rounded-md bg-gray-800 px-2 text-white">
           comments
         </span>
-        <span className="text-2xl">.com</span>
+        <span className="text-sm sm:text-xl">.com</span>
       </p>
-    </header>
-  )
-}
 
-function Footer() {
-  return (
-    <footer className="flex flex-col items-center gap-4">
-      <Link
-        onClick={() => captureEvent("Ko-fi")}
-        href="https://dub.sh/danielkofi"
-        target="_blank"
-      >
-        <Image
-          src="/buy-me-a-coffee.jpg"
-          alt="Buy me a coffee"
-          width={220}
-          height={80}
-        />
-      </Link>
-
-      <Link
-        onClick={() => captureEvent("Follow me on twitter")}
-        href="https://dub.sh/danielx"
-        target="_blank"
-        rel="noreferrer"
-        className="animate-fade-up mx-auto mb-5 flex max-w-fit items-center justify-center space-x-2 overflow-hidden rounded-full border border-gray-200 bg-gray-100 px-7 py-2 transition-colors hover:bg-gray-50"
-      >
-        <svg
-          width="300"
-          height="300"
-          viewBox="0 0 300 300"
-          version="1.1"
-          xmlns="http://www.w3.org/2000/svg"
-          className="h-4 w-4 p-px text-gray-600"
+      <div className="flex items-center gap-2 sm:gap-4">
+        <Link
+          className="inline-flex h-9 items-center space-x-2 rounded-md bg-yellow-300 px-3 py-2 text-gray-900 transition-colors hover:bg-yellow-400"
+          onClick={() => captureEvent("Ko-fi")}
+          href="https://dub.sh/danielkofi"
+          target="_blank"
         >
-          <path
-            stroke="currentColor"
-            d="M178.57 127.15 290.27 0h-26.46l-97.03 110.38L89.34 0H0l117.13 166.93L0 300.25h26.46l102.4-116.59 81.8 116.59h89.34M36.01 19.54H76.66l187.13 262.13h-40.66"
-          />
-        </svg>
-        <p className="text-sm font-semibold text-gray-600">
-          Follow me on twitter
-        </p>
-      </Link>
-    </footer>
+          <CoffeeIcon />
+          <span className="hidden text-sm font-semibold sm:block">
+            Buy Me a Coffee
+          </span>
+        </Link>
+
+        <Link
+          onClick={() => captureEvent("Follow me on twitter")}
+          href="https://dub.sh/danielx"
+          target="_blank"
+          className="inline-flex h-9 items-center space-x-2 rounded-md bg-black px-3 py-2 text-white transition-colors hover:bg-slate-900"
+        >
+          <svg
+            width="13"
+            height="13"
+            xmlns="http://www.w3.org/2000/svg"
+            shape-rendering="geometricPrecision"
+            text-rendering="geometricPrecision"
+            image-rendering="optimizeQuality"
+            fill-rule="evenodd"
+            clip-rule="evenodd"
+            viewBox="0 0 512 462.799"
+          >
+            <path
+              fill="#fff"
+              fill-rule="nonzero"
+              d="M403.229 0h78.506L310.219 196.04 512 462.799H354.002L230.261 301.007 88.669 462.799h-78.56l183.455-209.683L0 0h161.999l111.856 147.88L403.229 0zm-27.556 415.805h43.505L138.363 44.527h-46.68l283.99 371.278z"
+            />
+          </svg>
+          <span className="hidden text-sm font-semibold sm:block">Twitter</span>
+        </Link>
+      </div>
+    </header>
   )
 }
 
@@ -128,7 +146,7 @@ function Video() {
   return (
     <div className="flex w-full flex-col gap-6 rounded-lg">
       <div className="flex flex-col items-center gap-4 md:flex-row md:gap-2">
-        <div className="relative w-full">
+        <div className="relative w-full min-w-72">
           <Input
             type="text"
             placeholder="Video URL"
