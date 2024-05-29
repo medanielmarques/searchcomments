@@ -339,6 +339,8 @@ function Comments({
 }
 
 function Comment({ comment }: { comment: Comment }) {
+  const { video } = useVideo()
+  const videoUrl = useVideoUrl()
   const { replies } = useReplies()
   const searchTerms = useSearchTerms()
   const videoActions = useActions()
@@ -400,6 +402,13 @@ function Comment({ comment }: { comment: Comment }) {
                       commentId: [comment.comment.id],
                       searchTerms: "",
                       includeReplies: true,
+                    })
+
+                    captureEvent("User clicked to Show replies", {
+                      videoTitle: video?.title,
+                      videoUrl,
+                      searchTerms,
+                      commentId: comment.comment.id,
                     })
                   }}
                 >
