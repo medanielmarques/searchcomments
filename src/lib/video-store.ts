@@ -121,7 +121,11 @@ export const useReplies = () => {
     isLoading: isLoadingReplies,
     error: errorReplies,
   } = api.videoRouter.fetchComments.useQuery(
-    { commentId: [commentId], searchTerms: "" },
+    {
+      commentId: [commentId],
+      searchTerms: "",
+      includeReplies: true,
+    },
     { enabled: false },
   )
 

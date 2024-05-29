@@ -63,6 +63,7 @@ export const videoRouter = createTRPCRouter({
         videoId: z.string().optional(),
         searchTerms: z.string(),
         commentId: z.string().array().optional(),
+        includeReplies: z.boolean().optional(),
       }),
     )
     .query(async ({ input }) => {
@@ -88,14 +89,16 @@ async function fetchCommentsWithSearchTerm({
   videoId,
   searchTerms,
   commentId,
+  includeReplies = false,
 }: {
   commentId?: string[] | undefined
   videoId?: string
   searchTerms: string
+  includeReplies?: boolean
 }) {
   const response = await youtube.commentThreads
     .list({
-      part: ["snippet", "replies"],
+      part: includeReplies ? ["snippet", "replies"] : ["snippet"],
       videoId,
       id: commentId,
       searchTerms,
