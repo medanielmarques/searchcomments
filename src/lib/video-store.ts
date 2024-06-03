@@ -32,8 +32,7 @@ type VideoStore = {
 const searchSuggestions = [
   { suggestion: "Song name", selected: false },
   { suggestion: "Product name", selected: false },
-  { suggestion: "His name", selected: false },
-  { suggestion: "Her name", selected: false },
+  { suggestion: "Thumbnail", selected: false },
   { suggestion: "Source", selected: false },
   { suggestion: "Link", selected: false },
 ]
