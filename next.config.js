@@ -2,18 +2,19 @@ await import("./src/env.js")
 
 /** @type {import("next").NextConfig} */
 const config = {
-  async rewrites() {
-    return [
-      {
-        source: "/ingest/:path*",
-        destination: "https://us.posthog.com/:path*",
-      },
-      {
-        source: "/ingest/:path*/",
-        destination: "https://us.posthog.com/:path*/",
-      },
-    ]
-  },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: "/ingest/:path*",
+  //       destination: "https://us.posthog.com/:path*",
+  //     },
+  //     {
+  //       source: "/ingest/:path*/",
+  //       destination: "https://us.posthog.com/:path*/",
+  //     },
+  //   ]
+  // },
+  skipTrailingSlashRedirect: true,
 
   eslint: {
     ignoreDuringBuilds: true,
