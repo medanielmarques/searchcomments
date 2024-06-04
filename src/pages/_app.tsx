@@ -14,7 +14,7 @@ import "../globals.css"
 
 const isProduction = process.env.NODE_ENV === "production"
 
-if (!isProduction && typeof window !== "undefined") {
+if (isProduction && typeof window !== "undefined") {
   posthog.init(process.env.NEXT_PUBLIC_POSTHOG_KEY!, {
     api_host: "/ingest",
     ui_host: "https://us.posthog.com",
