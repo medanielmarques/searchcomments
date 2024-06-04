@@ -239,12 +239,21 @@ function SearchComments() {
   async function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === "Enter") {
       event.preventDefault()
-
-      await utils.videoRouter.fetchComments.fetch({
-        videoId,
-        searchTerms,
-      })
+      await handleCommentClick()
     }
+  }
+
+  async function handleCommentClick() {
+    await utils.videoRouter.fetchComments.fetch({
+      videoId,
+      searchTerms,
+    })
+
+    captureEvent("Video + search term", {
+      videoTitle: video?.title,
+      videoUrl,
+      searchTerms,
+    })
   }
 
   return (
@@ -261,18 +270,7 @@ function SearchComments() {
 
         <div
           className="absolute right-0 top-0 rounded-md bg-gray-100 hover:cursor-pointer hover:bg-gray-200 md:bg-inherit"
-          onClick={async () => {
-            await utils.videoRouter.fetchComments.fetch({
-              videoId,
-              searchTerms,
-            })
-
-            captureEvent("Video info + search term", {
-              videoTitle: video?.title,
-              videoUrl,
-              searchTerms,
-            })
-          }}
+          onClick={handleCommentClick}
         >
           {isLoadingComments ? (
             <ReloadIcon className="m-2.5 h-4 w-4 animate-spin" />
