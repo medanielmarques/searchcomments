@@ -1,4 +1,5 @@
 import { Header } from "@/components/header"
+import { SEO } from "@/components/seo"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -28,9 +29,9 @@ export default function Home() {
 
   return (
     <>
-      <div className="flex items-center justify-center">
-        <Header />
-      </div>
+      <SEO />
+      <Header />
+
       <div className="relative flex w-full items-center justify-center bg-white">
         <div className="flex flex-col items-center justify-between py-8 md:gap-16">
           <main className="flex w-11/12 max-w-sm flex-col justify-center gap-8 py-8 md:w-screen md:max-w-2xl md:py-0 lg:max-w-2xl">
