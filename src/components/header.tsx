@@ -77,6 +77,7 @@ export function Header() {
             href="https://app.searchcomments.com/feature"
             target="_blank"
             className="hidden h-9 items-center space-x-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium text-black transition-colors hover:bg-gray-100 sm:block"
+            title="Request a feature"
           >
             Request a feature
           </Link>
@@ -86,6 +87,7 @@ export function Header() {
             href="https://app.searchcomments.com/feature"
             target="_blank"
             className="sm:hidden"
+            title="Request a feature"
           >
             <Image
               className="rounded-md"

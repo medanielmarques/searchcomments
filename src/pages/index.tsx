@@ -106,7 +106,11 @@ function Video() {
 
       {!isLoadingVideo && video && (
         <div className="w-full">
-          <Link href={video?.videoUrl ?? ""} target="_blank">
+          <Link
+            href={video?.videoUrl ?? ""}
+            target="_blank"
+            title={video?.title}
+          >
             <div className="flex gap-3">
               <div>
                 <Image
@@ -323,7 +327,11 @@ function Comment({ comment }: { comment: Comment }) {
               {parseInt(comment.comment.likes) === 1 ? "like" : "likes"}
             </p>
             |
-            <Link target="_blank" href={comment.comment.viewCommentUrl}>
+            <Link
+              target="_blank"
+              href={comment.comment.viewCommentUrl}
+              title="Go to comment"
+            >
               Go to comment
             </Link>
             {comment.comment.repliesCount > 0 && (
