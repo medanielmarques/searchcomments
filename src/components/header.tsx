@@ -41,6 +41,7 @@ export function Header() {
             onClick={() => captureEvent("Ko-fi")}
             href="https://dub.sh/danielkofi"
             target="_blank"
+            title="Buy me a coffee"
           >
             <CoffeeIcon />
           </Link>
@@ -50,6 +51,7 @@ export function Header() {
             href="https://dub.sh/danielx"
             target="_blank"
             className="inline-flex h-9 items-center space-x-2 rounded-md bg-black px-3 py-2 text-white transition-colors hover:bg-slate-900"
+            title="Follow me on twitter"
           >
             <svg
               width="13"
