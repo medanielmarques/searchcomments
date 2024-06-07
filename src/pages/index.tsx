@@ -32,7 +32,7 @@ export default function Home() {
       <SEO />
       <Header />
 
-      <div className="relative flex w-full items-center justify-center bg-white">
+      <div className="relative flex w-full items-center justify-center">
         <div className="flex flex-col items-center justify-between py-8 md:gap-16">
           <main className="flex w-11/12 max-w-sm flex-col justify-center gap-8 py-8 md:w-screen md:max-w-2xl md:py-0 lg:max-w-2xl">
             <div className="flex w-full flex-col gap-6">
@@ -90,7 +90,7 @@ function Video() {
           />
 
           <div
-            className="absolute right-0 top-0 rounded-md bg-gray-100 hover:cursor-pointer hover:bg-gray-200 md:bg-inherit"
+            className="absolute right-0 top-0 rounded-md bg-gray-100 hover:cursor-pointer hover:bg-gray-200 dark:bg-zinc-800 sm:dark:bg-inherit md:bg-inherit"
             onClick={async () => {
               await utils.videoRouter.fetchVideoInfo.fetch({ videoId })
             }}
@@ -98,7 +98,7 @@ function Video() {
             {isLoadingVideo ? (
               <ReloadIcon className="m-2.5 h-4 w-4 animate-spin" />
             ) : (
-              <MagnifyingGlassIcon className="m-2.5 h-4 w-4 text-muted-foreground" />
+              <MagnifyingGlassIcon className="m-2.5 h-4 w-4 text-muted-foreground dark:text-zinc-200" />
             )}
           </div>
         </div>
@@ -184,7 +184,7 @@ function SearchComments() {
     <div className="flex w-full flex-col items-center gap-4 md:flex-row md:gap-2">
       <div className="relative w-full">
         <Input
-          className="w-full bg-white"
+          className="w-full"
           type="text"
           onChange={(e) => videoActions.setSearchTerms(e.target.value)}
           onKeyDown={handleKeyDown}
@@ -194,13 +194,13 @@ function SearchComments() {
         />
 
         <div
-          className="absolute right-0 top-0 rounded-md bg-gray-100 hover:cursor-pointer hover:bg-gray-200 md:bg-inherit"
+          className="absolute right-0 top-0 rounded-md bg-gray-100 hover:cursor-pointer hover:bg-gray-200 dark:bg-zinc-800 sm:dark:bg-inherit md:bg-inherit"
           onClick={handleCommentClick}
         >
           {isLoadingComments ? (
             <ReloadIcon className="m-2.5 h-4 w-4 animate-spin" />
           ) : (
-            <MagnifyingGlassIcon className="m-2.5 h-4 w-4 text-muted-foreground" />
+            <MagnifyingGlassIcon className="m-2.5 h-4 w-4 text-muted-foreground dark:text-zinc-200" />
           )}
         </div>
       </div>
@@ -221,7 +221,7 @@ function SearchSuggestions() {
     <div className="flex flex-wrap items-center gap-3">
       {searchSuggestions.map(({ suggestion, selected }) => (
         <Button
-          className={`h-8 rounded-lg ${selected ? "bg-black text-white" : "bg-zinc-100"} text-sm font-semibold ${selected ? "hover:bg-black" : "hover:bg-zinc-200"}`}
+          className={`h-8 rounded-lg ${selected && "bg-black text-white hover:bg-black dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"} text-sm font-semibold`}
           key={suggestion}
           variant="secondary"
           onClick={async () => {
@@ -321,7 +321,7 @@ function Comment({ comment }: { comment: Comment }) {
               wordsToHighlight={searchTerms}
             />
           </div>
-          <div className="flex items-center gap-2 text-xs text-blue-600">
+          <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-300">
             <p>
               {comment.comment.likes}{" "}
               {parseInt(comment.comment.likes) === 1 ? "like" : "likes"}
@@ -387,7 +387,10 @@ function highlightText(text: string, phrase: string) {
     const lowerCasePart = part.toLowerCase()
     const lowerCaseWords = words.map((word) => word.toLowerCase())
     return lowerCaseWords.includes(lowerCasePart) ? (
-      <span key={index} className="rounded-md bg-yellow-300 p-1 font-medium">
+      <span
+        key={index}
+        className="rounded-md bg-yellow-300 p-1 font-semibold dark:bg-yellow-700"
+      >
         {part}
       </span>
     ) : (
