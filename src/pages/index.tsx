@@ -221,13 +221,13 @@ function SearchSuggestions() {
     <div className="flex flex-wrap items-center gap-3">
       {searchSuggestions.map(({ suggestion, selected }) => (
         <Button
-          className={`h-8 rounded-lg ${selected ? "bg-black text-white hover:bg-primary/90" : "bg-zinc-100"} text-sm font-semibold hover:bg-zinc-200`}
+          className={`h-8 rounded-lg ${selected ? "bg-black text-white" : "bg-zinc-100"} text-sm font-semibold ${selected ? "hover:bg-black" : "hover:bg-zinc-200"}`}
           key={suggestion}
           variant="secondary"
           onClick={async () => {
             await utils.videoRouter.fetchComments.fetch({
               videoId,
-              searchTerms,
+              searchTerms: suggestion,
             })
 
             const newSuggestions = searchSuggestions.map((s) => {
