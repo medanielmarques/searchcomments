@@ -4,12 +4,19 @@ export function SEO() {
   return (
     <>
       <NextSeo
-        title="Search Comments"
-        description="Search Comments: The ultimate comment searcher."
+        title="Search Youtube Comments"
+        description="Search any comment on Youtube videos"
         canonical="https://searchcomments.com"
+        additionalMetaTags={[
+          {
+            name: "keywords",
+            content:
+              "Search comments, Comment, Finder, View Comment feeds, Youtube, Search, YT",
+          },
+        ]}
         openGraph={{
-          title: "Search Comments",
-          description: "Search Comments: The ultimate comment searcher.",
+          title: "Search Youtube Comments",
+          description: "Search any comment on Youtube videos",
           url: "https://searchcomments.com",
           // images: [
           //   {
