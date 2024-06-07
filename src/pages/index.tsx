@@ -381,7 +381,7 @@ function Comment({ comment }: { comment: Comment }) {
 function highlightText(text: string, phrase: string) {
   if (!phrase) return text
   const words = phrase.split(" ").filter((word) => word)
-  const regex = new RegExp(`\\b(${words.join("|")})\\b`, "gi")
+  const regex = new RegExp(`(${words.join("|")})`, "gi")
 
   return text.split(regex).map((part, index) => {
     const lowerCasePart = part.toLowerCase()
