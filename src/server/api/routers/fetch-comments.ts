@@ -1,5 +1,7 @@
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc"
 import { TRPCError } from "@trpc/server"
+import { Ratelimit } from "@upstash/ratelimit"
+import { Redis } from "@upstash/redis"
 import { google } from "googleapis"
 import { z } from "zod"
 
@@ -66,7 +68,19 @@ export const videoRouter = createTRPCRouter({
         includeReplies: z.boolean().optional(),
       }),
     )
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
+      const ratelimit = new Ratelimit({
+        redis: Redis.fromEnv(),
+        limiter: Ratelimit.slidingWindow(5, "10 s"),
+      })
+
+      const identifier = ctx.userIp
+      const { success } = await ratelimit.limit(identifier)
+
+      if (!success) {
+        return "Unable to process at this time"
+      }
+
       const commentsResponse = await fetchCommentsWithSearchTerm(input)
 
       const comments: Comment[] = commentsResponse.data.items.map((item) =>
