@@ -69,16 +69,18 @@ export const videoRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      const ratelimit = new Ratelimit({
-        redis: Redis.fromEnv(),
-        limiter: Ratelimit.slidingWindow(5, "10 s"),
-      })
+      if (process.env.NODE_ENV === "production") {
+        const ratelimit = new Ratelimit({
+          redis: Redis.fromEnv(),
+          limiter: Ratelimit.slidingWindow(5, "10 s"),
+        })
 
-      const identifier = ctx.userIp
-      const { success } = await ratelimit.limit(identifier)
+        const identifier = ctx.userIp
+        const { success } = await ratelimit.limit(identifier)
 
-      if (!success) {
-        return "Unable to process at this time"
+        if (!success) {
+          throw new TRPCError({ code: "TOO_MANY_REQUESTS" })
+        }
       }
 
       const commentsResponse = await fetchCommentsWithSearchTerm(input)
