@@ -119,6 +119,7 @@ async function fetchCommentsWithSearchTerm({
       id: commentId,
       searchTerms,
       maxResults: 50,
+      order: "relevance",
     })
     .catch((error) => {
       console.error("Error fetching comments:", error)
