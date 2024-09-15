@@ -164,7 +164,7 @@ function mapComment(item) {
     },
     comment: {
       id: item.snippet.topLevelComment.id,
-      content: comment.textDisplay,
+      content: comment.textOriginal,
       date,
       likes: formatCount(comment.likeCount),
       repliesCount: item.snippet.totalReplyCount,
@@ -185,7 +185,7 @@ function mapReplies(item) {
           },
           comment: {
             id: item.id,
-            content: reply.textDisplay,
+            content: reply.textOriginal,
             date: reply.publishedAt,
             likes: formatCount(reply.likeCount),
             viewCommentUrl: `https://www.youtube.com/watch?v=${reply.videoId}&lc=${item.id}`,
