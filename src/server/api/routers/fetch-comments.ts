@@ -117,9 +117,8 @@ async function fetchCommentsWithSearchTerm({
       part: includeReplies ? ["snippet", "replies"] : ["snippet"],
       videoId,
       id: commentId,
-      searchTerms,
+      ...(searchTerms ? { searchTerms } : { order: "relevance" }),
       maxResults: 50,
-      order: "relevance",
     })
     .catch((error) => {
       console.error("Error fetching comments:", error)
