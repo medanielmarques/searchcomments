@@ -1,8 +1,9 @@
+import { env } from "@/env"
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc"
 import { TRPCError } from "@trpc/server"
 import { Ratelimit } from "@upstash/ratelimit"
 import { Redis } from "@upstash/redis"
-import { google } from "googleapis"
+import { google, type youtube_v3 } from "googleapis"
 import { z } from "zod"
 
 const youtube = google.youtube({
@@ -20,116 +21,6 @@ export type Video = {
   videoUrl: string
 }
 
-async function fetchVideoInfo(videoId: string) {
-  const response = await youtube.videos
-    .list({
-      part: ["snippet", "statistics"],
-      id: videoId,
-    })
-    .catch((error) => {
-      console.error("Error fetching video information:", error)
-      return null
-    })
-
-  if (response.data.items.length === 0) {
-    throw new TRPCError({ code: "NOT_FOUND", message: "Video not found" })
-  }
-
-  const video = response.data.items[0]
-
-  const title = video.snippet.title
-  const channelName = video.snippet.channelTitle
-  const thumbnail = video.snippet.thumbnails.maxres
-    ? video.snippet.thumbnails.maxres.url
-    : video.snippet.thumbnails.high.url
-  const commentCount = formatCount(video.statistics.commentCount)
-  const likeCount = formatCount(video.statistics.likeCount)
-  const viewCount = formatCount(video.statistics.viewCount)
-  const videoUrl = `https://www.youtube.com/watch?v=${videoId}`
-
-  return {
-    title,
-    channelName,
-    thumbnail,
-    commentCount,
-    likeCount,
-    viewCount,
-    videoUrl,
-  } as Video
-}
-
-export const videoRouter = createTRPCRouter({
-  fetchComments: publicProcedure
-    .input(
-      z.object({
-        videoId: z.string().optional(),
-        searchTerms: z.string(),
-        commentId: z.string().array().optional(),
-        includeReplies: z.boolean().optional(),
-      }),
-    )
-    .query(async ({ input, ctx }) => {
-      if (process.env.NODE_ENV === "production") {
-        const ratelimit = new Ratelimit({
-          redis: Redis.fromEnv(),
-          limiter: Ratelimit.slidingWindow(5, "10 s"),
-        })
-
-        const identifier = ctx.userIp
-        const { success } = await ratelimit.limit(identifier)
-
-        if (!success) {
-          throw new TRPCError({ code: "TOO_MANY_REQUESTS" })
-        }
-      }
-
-      const commentsResponse = await fetchCommentsWithSearchTerm(input)
-
-      const comments: Comment[] = commentsResponse.data.items.map((item) =>
-        formatComment(item),
-      )
-
-      return { comments }
-    }),
-
-  fetchVideoInfo: publicProcedure
-    .input(z.object({ videoId: z.string() }))
-    .query(async ({ input }) => {
-      const video = await fetchVideoInfo(input.videoId)
-
-      return video
-    }),
-})
-
-async function fetchCommentsWithSearchTerm({
-  videoId,
-  searchTerms,
-  commentId,
-  includeReplies = false,
-}: {
-  commentId?: string[] | undefined
-  videoId?: string
-  searchTerms: string
-  includeReplies?: boolean
-}) {
-  const response = await youtube.commentThreads
-    .list({
-      part: includeReplies ? ["snippet", "replies"] : ["snippet"],
-      videoId,
-      id: commentId,
-      ...(searchTerms ? { searchTerms } : { order: "relevance" }),
-      maxResults: 50,
-    })
-    .catch((error) => {
-      console.error("Error fetching comments:", error)
-      return []
-    })
-
-  return response
-}
-
-type Reply = Omit<Comment, "replies">
-
 export type Comment = {
   author: {
     name: string
@@ -146,60 +37,178 @@ export type Comment = {
   replies: Reply[]
 }
 
-function formatComment(item) {
-  return {
-    ...mapComment(item),
-    replies: mapReplies(item),
-  } as Comment
+type Reply = {
+  author: Comment["author"]
+  comment: Omit<Comment["comment"], "repliesCount">
 }
 
-function mapComment(item) {
-  const comment = item.snippet.topLevelComment.snippet
-  const date = new Date(comment.publishedAt).toLocaleDateString()
+const formatCountCommentThread = (count: number): string => {
+  if (count >= 1_000_000_000) return `${(count / 1_000_000_000).toFixed(1)}B`
+  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`
+  if (count >= 1_000) return `${(count / 1_000).toFixed(1)}K`
+  return count.toString()
+}
+
+const formatCountVideoInfo = (count: string): string => {
+  const countNumber = Number(count)
+
+  if (countNumber >= 1_000_000_000)
+    return `${(countNumber / 1_000_000_000).toFixed(1)}B`
+  if (countNumber >= 1_000_000)
+    return `${(countNumber / 1_000_000).toFixed(1)}M`
+  if (countNumber >= 1_000) return `${(countNumber / 1_000).toFixed(1)}K`
+  return count
+}
+
+const mapComment = (
+  item: youtube_v3.Schema$CommentThread,
+): Omit<Comment, "replies"> => {
+  const comment = item.snippet!.topLevelComment!.snippet!
+  const date = new Date(comment.publishedAt!).toLocaleDateString()
 
   return {
     author: {
-      name: comment.authorDisplayName,
-      photo: comment.authorProfileImageUrl,
+      name: comment.authorDisplayName!,
+      photo: comment.authorProfileImageUrl!,
     },
     comment: {
-      id: item.snippet.topLevelComment.id,
-      content: comment.textOriginal,
+      id: item.snippet!.topLevelComment!.id!,
+      content: comment.textOriginal!,
       date,
-      likes: formatCount(comment.likeCount),
-      repliesCount: item.snippet.totalReplyCount,
-      viewCommentUrl: `https://www.youtube.com/watch?v=${comment.videoId}&lc=${item.snippet.topLevelComment.id}`,
+      likes: formatCountCommentThread(comment.likeCount!),
+      repliesCount: item.snippet!.totalReplyCount!,
+      viewCommentUrl: `https://www.youtube.com/watch?v=${comment.videoId}&lc=${item.snippet!.topLevelComment!.id}`,
     },
   }
 }
 
-function mapReplies(item) {
-  return item.replies
-    ? item.replies.comments.map((item) => {
-        const reply = item.snippet
+const mapReplies = (item: youtube_v3.Schema$CommentThread): Reply[] => {
+  return (
+    item.replies?.comments?.map((replyItem) => {
+      const reply = replyItem.snippet!
 
-        return {
-          author: {
-            name: reply.authorDisplayName,
-            photo: reply.authorProfileImageUrl,
-          },
-          comment: {
-            id: item.id,
-            content: reply.textOriginal,
-            date: reply.publishedAt,
-            likes: formatCount(reply.likeCount),
-            viewCommentUrl: `https://www.youtube.com/watch?v=${reply.videoId}&lc=${item.id}`,
-          },
-        }
+      return {
+        author: {
+          name: reply.authorDisplayName!,
+          photo: reply.authorProfileImageUrl!,
+        },
+        comment: {
+          id: replyItem.id!,
+          content: reply.textOriginal!,
+          date: reply.publishedAt!,
+          likes: formatCountCommentThread(reply.likeCount!),
+          viewCommentUrl: `https://www.youtube.com/watch?v=${reply.videoId}&lc=${replyItem.id}`,
+        },
+      }
+    }) ?? []
+  )
+}
+
+const formatComment = (item: youtube_v3.Schema$CommentThread): Comment => ({
+  ...mapComment(item),
+  replies: mapReplies(item),
+})
+
+const fetchVideoInfo = async (videoId: string): Promise<Video> => {
+  const response = await youtube.videos
+    .list({
+      part: ["snippet", "statistics"],
+      id: [videoId],
+    })
+    .catch((error) => {
+      console.error("Error fetching video information:", error)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to fetch video information",
       })
-    : []
+    })
+
+  if (!response.data.items || response.data.items.length === 0) {
+    throw new TRPCError({ code: "NOT_FOUND", message: "Video not found" })
+  }
+
+  const video = response.data.items[0]
+  const snippet = video!.snippet!
+  const statistics = video!.statistics!
+
+  return {
+    title: snippet.title!,
+    channelName: snippet.channelTitle!,
+    thumbnail:
+      snippet.thumbnails?.maxres?.url ?? snippet.thumbnails?.high?.url ?? "",
+    commentCount: formatCountVideoInfo(statistics.commentCount ?? "0"),
+    likeCount: formatCountVideoInfo(statistics.likeCount ?? "0"),
+    viewCount: formatCountVideoInfo(statistics.viewCount ?? "0"),
+    videoUrl: `https://www.youtube.com/watch?v=${videoId}`,
+  }
 }
 
-function formatCount(count: string) {
-  const number = parseInt(count)
+const fetchCommentsWithSearchTerm = async ({
+  videoId,
+  searchTerms,
+  commentId,
+  includeReplies = false,
+}: {
+  videoId?: string
+  searchTerms: string
+  commentId?: string[]
+  includeReplies?: boolean
+}): Promise<youtube_v3.Schema$CommentThreadListResponse> => {
+  const response = await youtube.commentThreads
+    .list({
+      part: includeReplies ? ["snippet", "replies"] : ["snippet"],
+      videoId,
+      id: commentId,
+      ...(searchTerms ? { searchTerms } : { order: "relevance" }),
+      maxResults: 50,
+    })
+    .catch((error) => {
+      console.error("Error fetching comments:", error)
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Failed to fetch comments",
+      })
+    })
 
-  if (number >= 1_000_000_000) return (number / 1_000_000_000).toFixed(1) + "B"
-  if (number >= 1_000_000) return (number / 1_000_000).toFixed(1) + "M"
-  if (number >= 1_000) return (number / 1_000).toFixed(1) + "K"
-  return count
+  return response.data
 }
+
+export const videoRouter = createTRPCRouter({
+  fetchComments: publicProcedure
+    .input(
+      z.object({
+        videoId: z.string().optional(),
+        searchTerms: z.string(),
+        commentId: z.array(z.string()).optional(),
+        includeReplies: z.boolean().optional(),
+      }),
+    )
+    .query(async ({ input, ctx }) => {
+      if (env.NODE_ENV === "production") {
+        const ratelimit = new Ratelimit({
+          redis: Redis.fromEnv(),
+          limiter: Ratelimit.slidingWindow(5, "10 s"),
+        })
+
+        const identifier = ctx.userIp
+        const { success } = await ratelimit.limit(identifier)
+
+        if (!success) {
+          throw new TRPCError({ code: "TOO_MANY_REQUESTS" })
+        }
+      }
+
+      const commentsResponse = await fetchCommentsWithSearchTerm(input)
+
+      const comments: Comment[] =
+        commentsResponse.items?.map(formatComment) ?? []
+
+      return { comments }
+    }),
+
+  fetchVideoInfo: publicProcedure
+    .input(z.object({ videoId: z.string() }))
+    .query(async ({ input }) => {
+      return await fetchVideoInfo(input.videoId)
+    }),
+})
