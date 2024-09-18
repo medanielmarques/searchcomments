@@ -23,6 +23,31 @@ import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 
+function DevModeQuickVideo() {
+  const { video } = useVideo()
+  const utils = api.useUtils()
+  const videoActions = useActions()
+
+  return process.env.NODE_ENV === "development" && !video ? (
+    <div>
+      <Button
+        variant="outline"
+        onClick={async () => {
+          videoActions.setVideoUrl(
+            "https://www.youtube.com/watch?v=0e3GPea1Tyg",
+          )
+
+          await utils.videoRouter.fetchVideoInfo.fetch({
+            videoId: "0e3GPea1Tyg",
+          })
+        }}
+      >
+        Quick video
+      </Button>
+    </div>
+  ) : null
+}
+
 export default function Home() {
   const { video } = useVideo()
   const { comments } = useComments()
@@ -38,6 +63,9 @@ export default function Home() {
             <div className="flex w-full flex-col gap-6">
               <div className="flex flex-col items-center gap-6">
                 <Video />
+
+                <DevModeQuickVideo />
+
                 {video && (
                   <>
                     <Separator />
@@ -63,10 +91,10 @@ function Video() {
   const videoId = useVideoId()
   const utils = api.useUtils()
 
-  const inputRef = useRef<HTMLInputElement>(null)
+  const videoUrlInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    inputRef.current?.focus()
+    videoUrlInputRef.current?.focus()
   }, [])
 
   async function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -86,7 +114,7 @@ function Video() {
             onKeyDown={handleKeyDown}
             value={videoUrl}
             onChange={(e) => videoActions.setVideoUrl(e.target.value)}
-            ref={inputRef}
+            ref={videoUrlInputRef}
           />
 
           <div
@@ -154,10 +182,10 @@ function SearchComments() {
   const videoUrl = useVideoUrl()
   const utils = api.useUtils()
 
-  const inputRef = useRef<HTMLInputElement>(null)
+  const searchCommentsInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
-    inputRef.current?.focus()
+    searchCommentsInputRef.current?.focus()
   }, [])
 
   async function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
@@ -190,7 +218,7 @@ function SearchComments() {
           onKeyDown={handleKeyDown}
           placeholder="Search the comments"
           value={searchTerms}
-          ref={inputRef}
+          ref={searchCommentsInputRef}
         />
 
         <div
