@@ -29,22 +29,18 @@ function DevModeQuickVideo() {
   const videoActions = useActions()
 
   return process.env.NODE_ENV === "development" && !video ? (
-    <div>
-      <Button
-        variant="outline"
-        onClick={async () => {
-          videoActions.setVideoUrl(
-            "https://www.youtube.com/watch?v=0e3GPea1Tyg",
-          )
+    <Button
+      variant="outline"
+      onClick={async () => {
+        videoActions.setVideoUrl("https://www.youtube.com/watch?v=0e3GPea1Tyg")
 
-          await utils.videoRouter.fetchVideoInfo.fetch({
-            videoId: "0e3GPea1Tyg",
-          })
-        }}
-      >
-        Quick video
-      </Button>
-    </div>
+        await utils.videoRouter.fetchVideoInfo.fetch({
+          videoId: "0e3GPea1Tyg",
+        })
+      }}
+    >
+      Quick video
+    </Button>
   ) : null
 }
 
