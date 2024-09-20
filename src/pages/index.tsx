@@ -323,21 +323,9 @@ function SearchSuggestions() {
   )
 }
 
-function Comments({
-  comments,
-  isReplies = false,
-}: {
-  comments: Comment[]
-  isReplies?: boolean
-}) {
+function Comments({ comments }: { comments: Comment[] }) {
   return (
     <div className="flex flex-col gap-6">
-      {!isReplies && (
-        <span className="text-lg font-medium">
-          Comments found ({comments?.length})
-        </span>
-      )}
-
       <div className="flex flex-col gap-8">
         {comments?.map((comment) => {
           return <Comment key={comment.comment.id} comment={comment} />
@@ -437,7 +425,7 @@ function Comment({ comment }: { comment: Comment }) {
       </div>
       {comment.comment.id === commentId && showReplies && (
         <div className="ml-14 mt-6">
-          <Comments comments={replies} isReplies />
+          <Comments comments={replies ?? []} />
         </div>
       )}
     </div>
