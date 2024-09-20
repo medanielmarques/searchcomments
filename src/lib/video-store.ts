@@ -29,7 +29,17 @@ type VideoStore = {
   }
 }
 
-const searchSuggestions = [
+const initialVideo: Video = {
+  title: "",
+  channelName: "",
+  thumbnail: "",
+  commentCount: "",
+  likeCount: "",
+  viewCount: "",
+  videoUrl: "",
+}
+
+const initialSearchSuggestions: Suggestion[] = [
   { suggestion: "Song name", selected: false },
   { suggestion: "Product name", selected: false },
   { suggestion: "Thumbnail", selected: false },
@@ -38,21 +48,12 @@ const searchSuggestions = [
 ]
 
 const useVideoStore = create<VideoStore>((set) => ({
-  video: {
-    title: "",
-    channelName: "",
-    thumbnail: "",
-    commentCount: "",
-    likeCount: "",
-    viewCount: "",
-    videoUrl: "",
-  },
+  video: initialVideo,
   comments: [],
   commentId: "",
-
   videoUrl: "",
   searchTerms: "",
-  searchSuggestions,
+  searchSuggestions: initialSearchSuggestions,
 
   actions: {
     setVideo: (video) => set({ video }),
@@ -147,12 +148,8 @@ export const useReplies = () => {
 }
 
 export const useCommentId = () => useVideoStore((state) => state.commentId)
-
 export const useVideoUrl = () => useVideoStore((state) => state.videoUrl)
-
 export const useSearchTerms = () => useVideoStore((state) => state.searchTerms)
-
+export const useActions = () => useVideoStore((state) => state.actions)
 export const useSearchSuggestions = () =>
   useVideoStore((state) => state.searchSuggestions)
-
-export const useActions = () => useVideoStore((state) => state.actions)
