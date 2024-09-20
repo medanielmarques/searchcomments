@@ -102,14 +102,27 @@ export const useComments = () => {
     data,
     isLoading: isLoadingComments,
     error: errorComments,
-  } = api.videoRouter.fetchComments.useQuery(
+    hasNextPage,
+    fetchNextPage,
+    isFetchingNextPage,
+  } = api.videoRouter.fetchComments.useInfiniteQuery(
     { videoId, searchTerms },
-    { enabled: false },
+    {
+      enabled: false,
+      getNextPageParam: (lastPage) => lastPage.nextPageToken,
+    },
   )
 
-  const comments = data?.comments
+  const comments = data?.pages.flatMap((page) => page.comments)
 
-  return { comments, isLoadingComments, errorComments }
+  return {
+    comments,
+    isLoadingComments,
+    errorComments,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  }
 }
 
 export const useReplies = () => {

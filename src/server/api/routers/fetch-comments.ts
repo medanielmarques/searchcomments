@@ -148,19 +148,19 @@ const fetchCommentsWithSearchTerm = async ({
   searchTerms,
   commentId,
   includeReplies = false,
-  pageToken,
+  cursor,
 }: {
   videoId?: string
   searchTerms: string
   commentId?: string[]
   includeReplies?: boolean
-  pageToken?: string
+  cursor?: string
 }): Promise<youtube_v3.Schema$CommentThreadListResponse> => {
   const response = await youtube.commentThreads
     .list({
       part: includeReplies ? ["snippet", "replies"] : ["snippet"],
       videoId,
-      pageToken,
+      pageToken: cursor,
       id: commentId,
       ...(searchTerms ? { searchTerms } : { order: "relevance" }),
       maxResults: 50,
@@ -184,7 +184,7 @@ export const videoRouter = createTRPCRouter({
         searchTerms: z.string(),
         commentId: z.array(z.string()).optional(),
         includeReplies: z.boolean().optional(),
-        cursor: z.number().nullish(),
+        cursor: z.string().nullish(),
       }),
     )
     .query(async ({ input, ctx }) => {

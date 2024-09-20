@@ -46,7 +46,33 @@ function DevModeQuickVideo() {
 
 export default function Home() {
   const { video } = useVideo()
-  const { comments } = useComments()
+  const { comments, fetchNextPage, hasNextPage, isFetchingNextPage } =
+    useComments()
+
+  const observerTarget = useRef(null)
+
+  useEffect(() => {
+    const currentTarget = observerTarget.current
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
+          void fetchNextPage()
+        }
+      },
+      { threshold: 1 },
+    )
+
+    if (currentTarget) {
+      observer.observe(currentTarget)
+    }
+
+    return () => {
+      if (currentTarget) {
+        observer.unobserve(currentTarget)
+      }
+    }
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
 
   return (
     <>
@@ -72,7 +98,21 @@ export default function Home() {
               {video && <SearchSuggestions />}
             </div>
 
-            {comments && <Comments comments={comments} />}
+            {Boolean(comments?.length) && comments && (
+              <>
+                <Comments comments={comments} />
+
+                {hasNextPage && (
+                  <div ref={observerTarget} className="h-10 w-full">
+                    {isFetchingNextPage && (
+                      <div className="flex justify-center">
+                        <ReloadIcon className="h-6 w-6 animate-spin" />
+                      </div>
+                    )}
+                  </div>
+                )}
+              </>
+            )}
           </main>
         </div>
       </div>
@@ -192,7 +232,7 @@ function SearchComments() {
   }
 
   async function handleCommentClick() {
-    await utils.videoRouter.fetchComments.fetch({
+    await utils.videoRouter.fetchComments.fetchInfinite({
       videoId,
       searchTerms,
     })
