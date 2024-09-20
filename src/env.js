@@ -7,7 +7,7 @@ export const env = createEnv({
     YOUTUBE_DATA_API_KEY: z.string(),
 
     DATABASE_URL: z.string().url(),
-    DATABASE_TOKEN: z.string(),
+    DATABASE_TOKEN: z.string().optional(),
   },
 
   client: {
