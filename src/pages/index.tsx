@@ -232,6 +232,8 @@ function SearchComments() {
   }
 
   async function handleCommentClick() {
+    if (process.env.NODE_ENV === "production" && searchTerms === "") return
+
     await utils.videoRouter.fetchComments.fetchInfinite({
       videoId,
       searchTerms,
