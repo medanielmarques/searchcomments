@@ -23,25 +23,21 @@ import Image from "next/image"
 import Link from "next/link"
 import { useEffect, useRef, useState } from "react"
 
-function DevModeQuickVideo() {
-  const { video } = useVideo()
+function DevModeQuickVideoButton() {
   const utils = api.useUtils()
   const videoActions = useActions()
 
-  return process.env.NODE_ENV === "development" && !video ? (
-    <Button
-      variant="outline"
-      onClick={async () => {
-        videoActions.setVideoUrl("https://www.youtube.com/watch?v=0e3GPea1Tyg")
+  async function handleQuickVideoClick() {
+    videoActions.setVideoUrl("https://www.youtube.com/watch?v=0e3GPea1Tyg")
 
-        await utils.videoRouter.fetchVideoInfo.fetch({
-          videoId: "0e3GPea1Tyg",
-        })
-      }}
-    >
+    await utils.videoRouter.fetchVideoInfo.fetch({ videoId: "0e3GPea1Tyg" })
+  }
+
+  return (
+    <Button variant="outline" onClick={handleQuickVideoClick}>
       Quick video
     </Button>
-  ) : null
+  )
 }
 
 export default function Home() {
@@ -74,6 +70,11 @@ export default function Home() {
     }
   }, [fetchNextPage, hasNextPage, isFetchingNextPage])
 
+  const showComments = Boolean(comments?.length) && comments
+
+  const showDevModeQuickVideoButton =
+    process.env.NODE_ENV === "development" && !video
+
   return (
     <>
       <SEO />
@@ -86,7 +87,7 @@ export default function Home() {
               <div className="flex flex-col items-center gap-6">
                 <Video />
 
-                <DevModeQuickVideo />
+                {showDevModeQuickVideoButton && <DevModeQuickVideoButton />}
 
                 {video && (
                   <>
@@ -98,7 +99,7 @@ export default function Home() {
               {video && <SearchSuggestions />}
             </div>
 
-            {Boolean(comments?.length) && comments && (
+            {showComments && (
               <>
                 <Comments comments={comments} />
 
@@ -140,6 +141,12 @@ function Video() {
     }
   }
 
+  async function handleVideoClick() {
+    await utils.videoRouter.fetchVideoInfo.fetch({ videoId })
+  }
+
+  const showVideoInfo = video && !isLoadingVideo
+
   return (
     <div className="flex w-full flex-col gap-6 rounded-lg">
       <div className="flex flex-col items-center gap-4 md:flex-row md:gap-2">
@@ -155,9 +162,7 @@ function Video() {
 
           <div
             className="absolute right-0 top-0 rounded-md bg-gray-100 hover:cursor-pointer hover:bg-gray-200 dark:bg-zinc-800 sm:dark:bg-inherit md:bg-inherit"
-            onClick={async () => {
-              await utils.videoRouter.fetchVideoInfo.fetch({ videoId })
-            }}
+            onClick={handleVideoClick}
           >
             {isLoadingVideo ? (
               <ReloadIcon className="m-2.5 h-4 w-4 animate-spin" />
@@ -168,7 +173,7 @@ function Video() {
         </div>
       </div>
 
-      {!isLoadingVideo && video && (
+      {showVideoInfo && (
         <div className="w-full">
           <Link
             href={video?.videoUrl ?? ""}
@@ -283,6 +288,32 @@ function SearchSuggestions() {
   const videoActions = useActions()
   const utils = api.useUtils()
 
+  async function handleSuggestionClick(suggestion: string) {
+    await utils.videoRouter.fetchComments.fetch({
+      videoId,
+      searchTerms: suggestion,
+    })
+
+    const newSuggestions = searchSuggestions.map((s) => {
+      s.suggestion === suggestion &&
+        videoActions.setSearchTerms(s.selected ? "" : s.suggestion)
+
+      return {
+        ...s,
+        selected: s.suggestion === suggestion && !s.selected,
+      }
+    })
+
+    videoActions.setSearchSuggestions(newSuggestions)
+
+    captureEvent("Search suggestions", {
+      videoTitle: video?.title,
+      videoUrl,
+      searchTerms,
+      suggestion,
+    })
+  }
+
   return (
     <div className="flex flex-wrap items-center gap-3">
       {searchSuggestions.map(({ suggestion, selected }) => (
@@ -290,31 +321,7 @@ function SearchSuggestions() {
           className={`h-8 rounded-lg ${selected && "bg-black text-white hover:bg-black dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"} text-sm font-semibold`}
           key={suggestion}
           variant="secondary"
-          onClick={async () => {
-            await utils.videoRouter.fetchComments.fetch({
-              videoId,
-              searchTerms: suggestion,
-            })
-
-            const newSuggestions = searchSuggestions.map((s) => {
-              s.suggestion === suggestion &&
-                videoActions.setSearchTerms(s.selected ? "" : s.suggestion)
-
-              return {
-                ...s,
-                selected: s.suggestion === suggestion && !s.selected,
-              }
-            })
-
-            videoActions.setSearchSuggestions(newSuggestions)
-
-            captureEvent("Search suggestions", {
-              videoTitle: video?.title,
-              videoUrl,
-              searchTerms,
-              suggestion,
-            })
-          }}
+          onClick={() => handleSuggestionClick(suggestion)}
         >
           {suggestion}
         </Button>
@@ -327,9 +334,9 @@ function Comments({ comments }: { comments: Comment[] }) {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-8">
-        {comments?.map((comment) => {
-          return <Comment key={comment.comment.id} comment={comment} />
-        })}
+        {comments?.map((comment) => (
+          <Comment key={comment.comment.id} comment={comment} />
+        ))}
       </div>
     </div>
   )
@@ -344,6 +351,35 @@ function Comment({ comment }: { comment: Comment }) {
   const [showReplies, setShowReplies] = useState(false)
   const commentId = useCommentId()
   const utils = api.useUtils()
+
+  async function handleShowRepliesClick() {
+    videoActions.setcommentId(comment.comment.id)
+    setShowReplies(!showReplies)
+
+    if (showReplies) return
+
+    await utils.videoRouter.fetchComments.fetch({
+      commentId: [comment.comment.id],
+      searchTerms: "",
+      includeReplies: true,
+    })
+
+    captureEvent("User clicked to Show replies", {
+      videoTitle: video?.title,
+      videoUrl,
+      searchTerms,
+      commentId: comment.comment.id,
+    })
+  }
+
+  const commentPostedDate = formatDistanceStrict(
+    new Date(comment.comment.date),
+    new Date(),
+    { addSuffix: true },
+  )
+
+  const showRepliesButton = comment.comment.repliesCount > 0
+  const showCommentReplies = comment.comment.id === commentId && showReplies
 
   return (
     <div>
@@ -361,20 +397,16 @@ function Comment({ comment }: { comment: Comment }) {
         <div className="flex w-full flex-col gap-2">
           <div className="flex items-center gap-2">
             <span>{comment.author.name}</span>
-            <span className="text-xs">
-              {formatDistanceStrict(
-                new Date(comment.comment.date),
-                new Date(),
-                { addSuffix: true },
-              )}
-            </span>
+            <span className="text-xs">{commentPostedDate}</span>
           </div>
+
           <div>
             <HighlightText
               text={comment.comment.content}
               wordsToHighlight={searchTerms}
             />
           </div>
+
           <div className="flex items-center gap-2 text-xs text-blue-600 dark:text-blue-300">
             <p>
               {comment.comment.likes}{" "}
@@ -388,30 +420,12 @@ function Comment({ comment }: { comment: Comment }) {
             >
               Go to comment
             </Link>
-            {comment.comment.repliesCount > 0 && (
+            {showRepliesButton && (
               <>
                 |
                 <div
                   className="hover:cursor-pointer"
-                  onClick={async () => {
-                    videoActions.setcommentId(comment.comment.id)
-                    setShowReplies(!showReplies)
-
-                    if (showReplies) return
-
-                    await utils.videoRouter.fetchComments.fetch({
-                      commentId: [comment.comment.id],
-                      searchTerms: "",
-                      includeReplies: true,
-                    })
-
-                    captureEvent("User clicked to Show replies", {
-                      videoTitle: video?.title,
-                      videoUrl,
-                      searchTerms,
-                      commentId: comment.comment.id,
-                    })
-                  }}
+                  onClick={handleShowRepliesClick}
                 >
                   <p>
                     {showReplies ? "Hide" : "Show"} replies (
@@ -423,7 +437,8 @@ function Comment({ comment }: { comment: Comment }) {
           </div>
         </div>
       </div>
-      {comment.comment.id === commentId && showReplies && (
+
+      {showCommentReplies && (
         <div className="ml-14 mt-6">
           <Comments comments={replies ?? []} />
         </div>
