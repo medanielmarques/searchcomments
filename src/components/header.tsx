@@ -111,7 +111,7 @@ function RequestFeatureLink() {
     <>
       <Link
         onClick={() => captureEvent("Insigh.to")}
-        href="https://app.searchcomments.com/feature"
+        href="https://insigh.to/b/searchcomments"
         target="_blank"
         className="hidden h-9 items-center space-x-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 dark:hover:bg-accent sm:block"
         title="Request a feature"
