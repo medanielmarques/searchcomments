@@ -1,6 +1,8 @@
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { api } from "@/utils/api"
+import { supabase } from "@/utils/supabase"
+import { SessionContextProvider } from "@supabase/auth-helpers-react"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
 import { type AppType } from "next/app"
 import { Montserrat } from "next/font/google"
@@ -32,7 +34,12 @@ const MyApp: AppType = ({ Component, pageProps }) => {
           enableSystem
           disableTransitionOnChange
         >
-          <Component {...pageProps} />
+          <SessionContextProvider
+            initialSession={pageProps.initialSession}
+            supabaseClient={supabase}
+          >
+            <Component {...pageProps} />
+          </SessionContextProvider>
         </ThemeProvider>
         <Toaster />
       </main>
