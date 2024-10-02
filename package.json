@@ -5,6 +5,10 @@
   "type": "module",
   "scripts": {
     "build": "next build",
+    "db:generate": "drizzle-kit generate && drizzle-kit generate --config drizzle.config.cache.ts",
+    "db:migrate": "drizzle-kit migrate && drizzle-kit migrate --config drizzle.config.cache.ts",
+    "db:studio": "drizzle-kit studio",
+    "db:studio:cache": "drizzle-kit studio --config drizzle.config.cache.ts --port 5000",
     "dev": "next dev",
     "lint": "next lint",
     "start": "next start"

@@ -4,8 +4,8 @@ import { type Config } from "drizzle-kit"
 const isDev = env.NODE_ENV === "development"
 
 export default {
-  schema: "./src/server/db/schema.ts",
-  out: "./migrations",
+  schema: "./src/server/db/main-schema.ts",
+  out: "./migrations/main-schema",
   dialect: "sqlite",
   ...(isDev
     ? {
