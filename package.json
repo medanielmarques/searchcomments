@@ -31,8 +31,6 @@
     "@trpc/next": "next",
     "@trpc/react-query": "next",
     "@trpc/server": "next",
-    "@upstash/ratelimit": "^1.2.0",
-    "@upstash/redis": "^1.31.3",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
