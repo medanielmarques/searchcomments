@@ -1,8 +1,6 @@
-import { env } from "@/env"
+import { rateLimit } from "@/lib/rate-limit"
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc"
 import { TRPCError } from "@trpc/server"
-import { Ratelimit } from "@upstash/ratelimit"
-import { Redis } from "@upstash/redis"
 import { google, type youtube_v3 } from "googleapis"
 import { z } from "zod"
 
@@ -188,19 +186,7 @@ export const videoRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      if (env.NODE_ENV === "production") {
-        const ratelimit = new Ratelimit({
-          redis: Redis.fromEnv(),
-          limiter: Ratelimit.slidingWindow(5, "10 s"),
-        })
-
-        const identifier = ctx.userIp
-        const { success } = await ratelimit.limit(identifier)
-
-        if (!success) {
-          throw new TRPCError({ code: "TOO_MANY_REQUESTS" })
-        }
-      }
+      await rateLimit({ ip: ctx.userIp })
 
       const commentsResponse = await fetchCommentsWithSearchTerm(input)
 
