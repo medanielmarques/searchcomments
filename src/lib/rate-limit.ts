@@ -10,8 +10,7 @@ const TIME_WINDOW = 10000
 export async function rateLimit({ ip }: { ip: string }) {
   const now = Date.now()
 
-  if (env.NODE_ENV !== "production") {
-    // if (true) {
+  if (env.NODE_ENV === "production") {
     const [existingLimit] = await cacheDB
       .select()
       .from(rateLimits)
