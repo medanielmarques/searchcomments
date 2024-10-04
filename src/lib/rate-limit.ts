@@ -10,7 +10,7 @@ const TIME_WINDOW = 10000
 export async function rateLimit({ ip }: { ip: string }) {
   const now = Date.now()
 
-  if (env.NODE_ENV !== "production") {
+  if (env.NODE_ENV === "production") {
     const [existingLimit] = await db
       .select()
       .from(rateLimits)
