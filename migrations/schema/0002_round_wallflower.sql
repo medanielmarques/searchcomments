@@ -1,0 +1,1 @@
+CREATE INDEX `ip_idx` ON `rate_limits` (`ip`);
