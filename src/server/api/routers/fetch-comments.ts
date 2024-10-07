@@ -1,3 +1,5 @@
+import { env } from "@/env"
+import { mockedComments, mockedVideo } from "@/lib/mock"
 import { rateLimit } from "@/lib/rate-limit"
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc"
 import { TRPCError } from "@trpc/server"
@@ -188,6 +190,13 @@ export const videoRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       await rateLimit({ ip: ctx.userIp })
 
+      if (env.NODE_ENV === "development") {
+        return {
+          comments: mockedComments,
+          nextPageToken: "token",
+        }
+      }
+
       const commentsResponse = await fetchCommentsWithSearchTerm(input)
 
       const comments: Comment[] =
@@ -198,7 +207,13 @@ export const videoRouter = createTRPCRouter({
 
   fetchVideoInfo: publicProcedure
     .input(z.object({ videoId: z.string() }))
-    .query(async ({ input }) => {
+    .query(async ({ input, ctx }) => {
+      await rateLimit({ ip: ctx.userIp, rateLimit: 3 })
+
+      if (env.NODE_ENV === "development") {
+        return mockedVideo
+      }
+
       return await fetchVideoInfo(input.videoId)
     }),
 })
