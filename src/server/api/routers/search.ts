@@ -1,6 +1,7 @@
 import { createTRPCRouter, publicProcedure } from "@/server/api/trpc"
 import { db } from "@/server/db"
-import { searchHistory } from "@/server/db/schema"
+import { searchHistoryTable } from "@/server/db/schema"
+import { eq } from "drizzle-orm"
 import { z } from "zod"
 
 export const searchRouter = createTRPCRouter({
@@ -14,8 +15,16 @@ export const searchRouter = createTRPCRouter({
       }),
     )
     .mutation(async ({ input }) => {
-      await db.insert(searchHistory).values({ ...input })
-
-      return {}
+      await db.insert(searchHistoryTable).values({ ...input })
     }),
+
+  getSearchHistory: publicProcedure.query(async () => {
+    const searchHistory = await db
+      .select()
+      .from(searchHistoryTable)
+      .where(eq(searchHistoryTable.userId, "userId"))
+      .limit(20)
+
+    return { searchHistory }
+  }),
 })

@@ -2,17 +2,17 @@ import { createId as cuid } from "@paralleldrive/cuid2"
 import { sql } from "drizzle-orm"
 import { index, int, integer, sqliteTable, text } from "drizzle-orm/sqlite-core"
 
-export const rateLimits = sqliteTable(
+export const rateLimitsTable = sqliteTable(
   "rate_limits",
   {
     ip: text("ip").primaryKey(),
     count: integer("count").notNull(),
     lastAccess: integer("last_access").notNull(),
   },
-  (rateLimits) => ({ ipIndex: index("ip_idx").on(rateLimits.ip) }),
+  (rateLimitsTable) => ({ ipIndex: index("ip_idx").on(rateLimitsTable.ip) }),
 )
 
-export const searchHistory = sqliteTable(
+export const searchHistoryTable = sqliteTable(
   "search_history",
   {
     id: text("id", { mode: "text" }).primaryKey().$default(cuid),
