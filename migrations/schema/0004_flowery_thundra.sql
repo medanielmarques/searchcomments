@@ -1,0 +1,1 @@
+ALTER TABLE `search_history` ADD `video_url` text NOT NULL;

@@ -15,7 +15,7 @@ import {
   useVideoId,
   useVideoUrl,
 } from "@/lib/video-store"
-import { type Comment } from "@/server/api/routers/fetch-comments"
+import { type Comment } from "@/server/api/use-cases/fetch-comments"
 import { api } from "@/utils/api"
 import { MagnifyingGlassIcon, ReloadIcon } from "@radix-ui/react-icons"
 import { formatDistanceStrict } from "date-fns"
@@ -30,7 +30,9 @@ function DevModeQuickVideoButton() {
   async function handleQuickVideoClick() {
     videoActions.setVideoUrl("https://www.youtube.com/watch?v=0e3GPea1Tyg")
 
-    await utils.videoRouter.fetchVideoInfo.fetch({ videoId: "0e3GPea1Tyg" })
+    await utils.videoContentRouter.getVideoInfo.fetch({
+      videoId: "0e3GPea1Tyg",
+    })
   }
 
   return (
@@ -137,12 +139,12 @@ function Video() {
   async function handleKeyDown(event: React.KeyboardEvent<HTMLInputElement>) {
     if (event.key === "Enter") {
       event.preventDefault()
-      await utils.videoRouter.fetchVideoInfo.fetch({ videoId })
+      await utils.videoContentRouter.getVideoInfo.fetch({ videoId })
     }
   }
 
   async function handleVideoClick() {
-    await utils.videoRouter.fetchVideoInfo.fetch({ videoId })
+    await utils.videoContentRouter.getVideoInfo.fetch({ videoId })
   }
 
   const showVideoInfo = video && !isLoadingVideo
@@ -222,6 +224,7 @@ function SearchComments() {
   const videoId = useVideoId()
   const videoUrl = useVideoUrl()
   const utils = api.useUtils()
+  const { mutate } = api.searchRouter.saveSearch.useMutation()
 
   const searchCommentsInputRef = useRef<HTMLInputElement>(null)
 
@@ -239,7 +242,14 @@ function SearchComments() {
   async function handleCommentClick() {
     if (process.env.NODE_ENV === "production" && searchTerms === "") return
 
-    await utils.videoRouter.fetchComments.fetchInfinite({
+    mutate({
+      userId: "userId",
+      query: searchTerms,
+      videoTitle: video?.title ?? "",
+      videoUrl,
+    })
+
+    await utils.videoContentRouter.getVideoComments.fetchInfinite({
       videoId,
       searchTerms,
     })
@@ -289,7 +299,7 @@ function SearchSuggestions() {
   const utils = api.useUtils()
 
   async function handleSuggestionClick(suggestion: string) {
-    await utils.videoRouter.fetchComments.fetch({
+    await utils.videoContentRouter.getVideoComments.fetch({
       videoId,
       searchTerms: suggestion,
     })
@@ -358,7 +368,7 @@ function Comment({ comment }: { comment: Comment }) {
 
     if (showReplies) return
 
-    await utils.videoRouter.fetchComments.fetch({
+    await utils.videoContentRouter.getVideoComments.fetch({
       commentId: [comment.comment.id],
       searchTerms: "",
       includeReplies: true,

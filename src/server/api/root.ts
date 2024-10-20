@@ -1,4 +1,5 @@
-import { videoRouter } from "@/server/api/routers/fetch-comments"
+import { searchRouter } from "@/server/api/routers/search"
+import { videoContentRouter } from "@/server/api/routers/video-content"
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc"
 
 /**
@@ -7,7 +8,8 @@ import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc"
  * All routers added in /api/routers should be manually added here.
  */
 export const appRouter = createTRPCRouter({
-  videoRouter,
+  videoContentRouter,
+  searchRouter,
 })
 
 // export type definition of API

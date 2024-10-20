@@ -1,4 +1,5 @@
 // For offline coding
+import { createId as cuid } from "@paralleldrive/cuid2"
 
 export const mockedVideo = {
   title:
@@ -29,7 +30,7 @@ export const mockedComment = {
   replies: [],
 }
 
-export const mockedComments = Array.from({ length: 50 }).map((_, index) => ({
+export const mockedComments = Array.from({ length: 50 }).map(() => ({
   ...mockedComment,
-  comment: { ...mockedComment.comment, id: `comment-${index}` },
+  comment: { ...mockedComment.comment, id: cuid() },
 }))

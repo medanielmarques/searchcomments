@@ -32,7 +32,9 @@ type CreateContextOptions = Record<string, never> | { userIp: string }
  * @see https://create.t3.gg/en/usage/trpc#-serverapitrpcts
  */
 const createInnerTRPCContext = (_opts: CreateContextOptions) => {
-  return { userIp: _opts.userIp }
+  return {
+    userIp: _opts.userIp,
+  }
 }
 
 /**

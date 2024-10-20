@@ -1,5 +1,6 @@
 import { useToast } from "@/components/ui/use-toast"
-import { type Comment, type Video } from "@/server/api/routers/fetch-comments"
+import { type Comment } from "@/server/api/use-cases/fetch-comments"
+import { type Video } from "@/server/api/use-cases/fetch-video"
 import { api } from "@/utils/api"
 import { useEffect } from "react"
 import { create } from "zustand"
@@ -81,7 +82,10 @@ export const useVideo = () => {
     isLoading: isLoadingVideo,
     error: errorVideo,
     isError: isErrorVideo,
-  } = api.videoRouter.fetchVideoInfo.useQuery({ videoId }, { enabled: false })
+  } = api.videoContentRouter.getVideoInfo.useQuery(
+    { videoId },
+    { enabled: false },
+  )
 
   useEffect(() => {
     if (isErrorVideo) {
@@ -106,7 +110,7 @@ export const useComments = () => {
     hasNextPage,
     fetchNextPage,
     isFetchingNextPage,
-  } = api.videoRouter.fetchComments.useInfiniteQuery(
+  } = api.videoContentRouter.getVideoComments.useInfiniteQuery(
     { videoId, searchTerms },
     {
       enabled: false,
@@ -133,7 +137,7 @@ export const useReplies = () => {
     data,
     isLoading: isLoadingReplies,
     error: errorReplies,
-  } = api.videoRouter.fetchComments.useQuery(
+  } = api.videoContentRouter.getVideoComments.useQuery(
     {
       commentId: [commentId],
       searchTerms: "",
