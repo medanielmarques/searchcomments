@@ -1,8 +1,9 @@
 import { Header } from "@/components/header"
-import { SEO } from "@/components/seo"
+import { SearchHistorySidebar } from "@/components/search-history-sidebar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
+import { useCommentsInfiniteScrolling } from "@/hooks/use-comments-infinite-scrolling"
 import { captureEvent } from "@/lib/analytics"
 import {
   useActions,
@@ -44,33 +45,9 @@ function DevModeQuickVideoButton() {
 
 export default function Home() {
   const { video } = useVideo()
-  const { comments, fetchNextPage, hasNextPage, isFetchingNextPage } =
-    useComments()
-
-  const observerTarget = useRef(null)
-
-  useEffect(() => {
-    const currentTarget = observerTarget.current
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0]?.isIntersecting && hasNextPage && !isFetchingNextPage) {
-          void fetchNextPage()
-        }
-      },
-      { threshold: 1 },
-    )
-
-    if (currentTarget) {
-      observer.observe(currentTarget)
-    }
-
-    return () => {
-      if (currentTarget) {
-        observer.unobserve(currentTarget)
-      }
-    }
-  }, [fetchNextPage, hasNextPage, isFetchingNextPage])
+  const { comments, hasNextPage, isFetchingNextPage } = useComments()
+  const { commentsInfiniteScrollingObserverTarget } =
+    useCommentsInfiniteScrolling()
 
   const showComments = Boolean(comments?.length) && comments
 
@@ -79,44 +56,50 @@ export default function Home() {
 
   return (
     <>
-      <SEO />
-      <Header />
+      <SearchHistorySidebar />
 
-      <div className="relative flex w-full items-center justify-center">
-        <div className="flex flex-col items-center justify-between py-8 md:gap-16">
-          <main className="flex w-11/12 max-w-sm flex-col justify-center gap-8 py-8 md:w-screen md:max-w-2xl md:py-0 lg:max-w-2xl">
-            <div className="flex w-full flex-col gap-6">
-              <div className="flex flex-col items-center gap-6">
-                <Video />
+      <div>
+        <Header />
 
-                {showDevModeQuickVideoButton && <DevModeQuickVideoButton />}
+        <div className="relative flex w-full items-center justify-center">
+          <div className="flex flex-col items-center justify-between py-8 md:gap-16">
+            <main className="flex w-11/12 max-w-sm flex-col justify-center gap-8 py-8 md:w-screen md:max-w-2xl md:py-0 lg:max-w-2xl">
+              <div className="flex w-full flex-col gap-6">
+                <div className="flex flex-col items-center gap-6">
+                  <Video />
 
-                {video && (
-                  <>
-                    <Separator />
-                    <SearchComments />
-                  </>
-                )}
+                  {showDevModeQuickVideoButton && <DevModeQuickVideoButton />}
+
+                  {video && (
+                    <>
+                      <Separator />
+                      <SearchComments />
+                    </>
+                  )}
+                </div>
+                {video && <SearchSuggestions />}
               </div>
-              {video && <SearchSuggestions />}
-            </div>
 
-            {showComments && (
-              <>
-                <Comments comments={comments} />
+              {showComments && (
+                <>
+                  <Comments comments={comments} />
 
-                {hasNextPage && (
-                  <div ref={observerTarget} className="h-10 w-full">
-                    {isFetchingNextPage && (
-                      <div className="flex justify-center">
-                        <ReloadIcon className="h-6 w-6 animate-spin" />
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            )}
-          </main>
+                  {hasNextPage && (
+                    <div
+                      ref={commentsInfiniteScrollingObserverTarget}
+                      className="h-10 w-full"
+                    >
+                      {isFetchingNextPage && (
+                        <div className="flex justify-center">
+                          <ReloadIcon className="h-6 w-6 animate-spin" />
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </>
+              )}
+            </main>
+          </div>
         </div>
       </div>
     </>

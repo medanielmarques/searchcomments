@@ -1,3 +1,4 @@
+import { SEO } from "@/components/seo"
 import { ThemeProvider } from "@/components/theme-provider"
 import { Toaster } from "@/components/ui/toaster"
 import { api } from "@/utils/api"
@@ -38,6 +39,7 @@ const MyApp: AppType = ({ Component, pageProps }) => {
             initialSession={pageProps.initialSession}
             supabaseClient={supabase}
           >
+            <SEO />
             <Component {...pageProps} />
           </SessionContextProvider>
         </ThemeProvider>

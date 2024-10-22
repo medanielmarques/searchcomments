@@ -1,5 +1,7 @@
 import { ToggleThemeButton } from "@/components/theme-provider"
+import { Button } from "@/components/ui/button"
 import { captureEvent } from "@/lib/analytics"
+import { useSession } from "@supabase/auth-helpers-react"
 import { useTheme } from "next-themes"
 import Image from "next/image"
 import Link from "next/link"
@@ -26,10 +28,16 @@ function CoffeeIcon() {
 }
 
 export function Header() {
+  const session = useSession()
+
   return (
     <header className="flex items-center justify-center">
       <div className="flex w-full max-w-2xl items-center justify-between px-2 py-2 sm:px-0">
         <Logo />
+
+        <div>
+          <Button>{session?.user ? "Sign out" : "Sign in"}</Button>
+        </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
           <BuyMeACoffeeLink />
