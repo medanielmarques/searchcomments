@@ -1,3 +1,4 @@
+import { Separator } from "@/components/ui/separator"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import {
   Sidebar,
@@ -32,17 +33,49 @@ export function AppSidebar() {
     <Sidebar>
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Application</SidebarGroupLabel>
+          <SidebarGroupLabel>Search history</SidebarGroupLabel>
           <SidebarGroupContent>
-            {data?.searchHistory.map((search) => (
-              <Link href={search.videoUrl} key={search.id} target="_blank">
-                <span>{search.videoTitle}</span>
-                <span>{search.query}</span>
-              </Link>
-            ))}
+            <div className="flex flex-col gap-4">
+              {data?.searchHistory.map((search) => (
+                <>
+                  <Separator />
+
+                  <div
+                    key={search.id}
+                    className="flex items-center justify-center"
+                  >
+                    <Link href={search.videoUrl} target="_blank">
+                      <div className="flex flex-col gap-4">
+                        <span>{search.createdAt.toLocaleDateString()}</span>
+                        <span>{limitParagraph(search.videoTitle)}</span>
+                        <span>{limitParagraph(search.query)}</span>
+                      </div>
+                    </Link>
+                  </div>
+                </>
+              ))}
+            </div>
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
     </Sidebar>
   )
+}
+
+function limitParagraph(text: string) {
+  const MAX_LENGTH = 50
+
+  if (text.length <= MAX_LENGTH) return text
+
+  let truncatedText = text.slice(0, MAX_LENGTH)
+
+  if (text[MAX_LENGTH] !== " ") {
+    const lastSpaceIndex = truncatedText.lastIndexOf(" ")
+
+    if (lastSpaceIndex !== -1) {
+      truncatedText = truncatedText.slice(0, lastSpaceIndex)
+    }
+  }
+
+  return truncatedText + "..."
 }

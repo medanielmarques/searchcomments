@@ -7,6 +7,9 @@ import { fetchVideoInfo } from "@/server/api/use-cases/fetch-video"
 import { createId as cuid } from "@paralleldrive/cuid2"
 import { z } from "zod"
 
+const shouldUseMockedData = ({ videoId }: { videoId?: string }) =>
+  env.NODE_ENV === "development" && !Boolean(videoId)
+
 export const videoContentRouter = createTRPCRouter({
   getVideoComments: publicProcedure
     .input(
@@ -21,7 +24,7 @@ export const videoContentRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       await rateLimit({ ip: ctx.userIp })
 
-      if (env.NODE_ENV === "development") {
+      if (shouldUseMockedData(input)) {
         return {
           comments: mockedComments,
           nextPageToken: cuid(),
@@ -38,7 +41,7 @@ export const videoContentRouter = createTRPCRouter({
     .query(async ({ input, ctx }) => {
       await rateLimit({ ip: ctx.userIp, rateLimit: 3 })
 
-      if (env.NODE_ENV === "development") {
+      if (shouldUseMockedData(input)) {
         return mockedVideo
       }
 
