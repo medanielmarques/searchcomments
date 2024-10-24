@@ -13,7 +13,7 @@ import Link from "next/link"
 export function SearchHistorySidebar({
   children,
 }: {
-  children: React.ReactNode
+  children?: React.ReactNode
 }) {
   return (
     <SidebarProvider>

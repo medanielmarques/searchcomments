@@ -55,10 +55,10 @@ export default function Home() {
     process.env.NODE_ENV === "development" && !video
 
   return (
-    <>
+    <div className="flex">
       <SearchHistorySidebar />
 
-      <div>
+      <div className="mx-auto">
         <Header />
 
         <div className="relative flex w-full items-center justify-center">
@@ -102,7 +102,7 @@ export default function Home() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   )
 }
 
