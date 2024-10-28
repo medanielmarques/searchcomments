@@ -72,7 +72,7 @@ function BuyMeACoffeeLink() {
   return (
     <Link
       className="inline-flex h-9 items-center space-x-2 rounded-md bg-yellow-300 px-3 py-2 text-gray-900"
-      onClick={() => captureEvent("Ko-fi")}
+      onClick={() => captureEvent({ event: "Ko-fi" })}
       href="https://dub.sh/danielkofi"
       target="_blank"
       title="Buy me a coffee"
@@ -87,7 +87,7 @@ function TwitterLink() {
 
   return (
     <Link
-      onClick={() => captureEvent("Follow me on twitter")}
+      onClick={() => captureEvent({ event: "Follow me on twitter" })}
       href="https://dub.sh/danielx"
       target="_blank"
       className="inline-flex h-9 items-center space-x-2 rounded-md bg-black px-3 py-2 text-white transition-colors hover:bg-slate-900 dark:bg-white"
@@ -118,7 +118,7 @@ function RequestFeatureLink() {
   return (
     <>
       <Link
-        onClick={() => captureEvent("Insigh.to")}
+        onClick={() => captureEvent({ event: "Insigh.to" })}
         href="https://insigh.to/b/searchcomments"
         target="_blank"
         className="hidden h-9 items-center space-x-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 dark:hover:bg-accent sm:block"
@@ -128,7 +128,7 @@ function RequestFeatureLink() {
       </Link>
 
       <Link
-        onClick={() => captureEvent("Insigh.to")}
+        onClick={() => captureEvent({ event: "Insigh.to" })}
         href="https://app.searchcomments.com/feature"
         target="_blank"
         className="sm:hidden"

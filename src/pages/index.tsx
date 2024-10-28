@@ -237,10 +237,14 @@ function SearchComments() {
       searchTerms,
     })
 
-    captureEvent("Video + search term", {
-      videoTitle: video?.title,
-      videoUrl,
-      searchTerms,
+    captureEvent({
+      event: "Video + search term",
+      user: {},
+      properties: {
+        videoTitle: video?.title,
+        videoUrl,
+        searchTerms,
+      },
     })
   }
 
@@ -299,11 +303,15 @@ function SearchSuggestions() {
 
     videoActions.setSearchSuggestions(newSuggestions)
 
-    captureEvent("Search suggestions", {
-      videoTitle: video?.title,
-      videoUrl,
-      searchTerms,
-      suggestion,
+    captureEvent({
+      event: "Search suggestions",
+      user: {},
+      properties: {
+        videoTitle: video?.title,
+        videoUrl,
+        searchTerms,
+        suggestion,
+      },
     })
   }
 
@@ -357,11 +365,15 @@ function Comment({ comment }: { comment: Comment }) {
       includeReplies: true,
     })
 
-    captureEvent("User clicked to Show replies", {
-      videoTitle: video?.title,
-      videoUrl,
-      searchTerms,
-      commentId: comment.comment.id,
+    captureEvent({
+      event: "User clicked to Show replies",
+      user: {},
+      properties: {
+        videoTitle: video?.title,
+        videoUrl,
+        searchTerms,
+        commentId: comment.comment.id,
+      },
     })
   }
 
