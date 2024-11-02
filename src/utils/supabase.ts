@@ -2,13 +2,12 @@ import { createPagesBrowserClient } from "@supabase/auth-helpers-nextjs"
 
 export const supabase = createPagesBrowserClient()
 
-export async function signInWithEmail() {
+export async function signInWithMagicLink(email: string) {
   await supabase.auth.signInWithOtp({
-    email: "daniel.brz2009@gmail.com",
+    email,
     options: {
-      // set this to false if you do not want the user to be automatically signed up
       shouldCreateUser: true,
-      emailRedirectTo: "http://localhost:3000",
+      emailRedirectTo: "http://localhost:3001",
     },
   })
 }

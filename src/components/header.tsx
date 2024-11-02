@@ -1,9 +1,15 @@
 import { ToggleThemeButton } from "@/components/theme-provider"
 import { Button } from "@/components/ui/button"
+import { signInWithMagicLink, signOut } from "@/utils/supabase"
 import { useSession } from "@supabase/auth-helpers-react"
 
 export function Header() {
   const session = useSession()
+
+  async function handleSession() {
+    if (session?.user.email) await signOut()
+    await signInWithMagicLink("daniel.brz2009@gmail.com")
+  }
 
   return (
     <header className="flex items-center justify-center">
@@ -11,7 +17,9 @@ export function Header() {
         <Logo />
 
         <div className="flex gap-2">
-          <Button>{session?.user ? "Sign out" : "Sign in"}</Button>
+          <Button onClick={handleSession}>
+            {session?.user.email ? "Sign out" : "Sign in"}
+          </Button>
           <ToggleThemeButton />
         </div>
       </div>
