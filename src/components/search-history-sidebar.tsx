@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/sidebar"
 import { captureEvent } from "@/lib/analytics"
 import { api } from "@/utils/api"
+import { useSession } from "@supabase/auth-helpers-react"
 import { useTheme } from "next-themes"
 import Link from "next/link"
 
@@ -29,7 +30,11 @@ export function SearchHistorySidebar({
 }
 
 export function AppSidebar() {
-  const { data } = api.searchRouter.getSearchHistory.useQuery()
+  const session = useSession()
+
+  const { data } = api.searchRouter.getSearchHistory.useQuery(undefined, {
+    enabled: !!session?.user.email,
+  })
 
   return (
     <Sidebar>
@@ -37,23 +42,29 @@ export function AppSidebar() {
         <SidebarGroup className="h-screen">
           <SidebarGroupLabel>Search history</SidebarGroupLabel>
           <SidebarGroupContent className="flex h-full flex-col justify-between">
-            <div className="flex flex-col gap-4">
-              {data?.searchHistory.map((search) => (
-                <div key={search.id}>
-                  <Separator />
+            {session?.user.email ? (
+              <div className="flex flex-col gap-4">
+                {data?.searchHistory.map((search) => (
+                  <div key={search.id}>
+                    <Separator />
 
-                  <div className="flex items-center justify-center">
-                    <Link href={search.videoUrl} target="_blank">
-                      <div className="flex flex-col gap-4">
-                        <span>{search.createdAt.toLocaleDateString()}</span>
-                        <span>{limitParagraph(search.videoTitle)}</span>
-                        <span>{limitParagraph(search.query)}</span>
-                      </div>
-                    </Link>
+                    <div className="flex items-center justify-center">
+                      <Link href={search.videoUrl} target="_blank">
+                        <div className="flex flex-col gap-4">
+                          <span>{search.createdAt.toLocaleDateString()}</span>
+                          <span>{limitParagraph(search.videoTitle)}</span>
+                          <span>{limitParagraph(search.query)}</span>
+                        </div>
+                      </Link>
+                    </div>
                   </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-4">
+                Sign in to see your search history
+              </div>
+            )}
 
             <Separator />
 

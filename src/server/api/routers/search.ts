@@ -22,7 +22,7 @@ export const searchRouter = createTRPCRouter({
     }),
 
   getSearchHistory: publicProcedure.query(async ({ ctx }) => {
-    if (!ctx.user) return { searchHistory: [] }
+    if (!ctx.user.email) return { searchHistory: [] }
 
     const searchHistory = await db
       .select()

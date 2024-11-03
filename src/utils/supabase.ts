@@ -29,12 +29,12 @@ export async function getUserAvatar() {
 }
 
 export async function getUser(req: NextApiRequest) {
-  const parsedAccessToken = JSON.parse(
-    req.cookies["sb-zgrdlqmodflvfgogztpp-auth-token"] ?? "",
-  )
+  const accessToken = req.cookies["sb-zgrdlqmodflvfgogztpp-auth-token"]
 
-  const accessToken = parsedAccessToken[0]
+  if (!accessToken) return null
 
-  const { data } = await supabaseServer.auth.getUser(accessToken)
+  const parsedAccessToken = JSON.parse(accessToken)
+
+  const { data } = await supabaseServer.auth.getUser(parsedAccessToken[0])
   return data.user
 }
