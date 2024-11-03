@@ -8,21 +8,26 @@ export const searchRouter = createTRPCRouter({
   saveSearch: publicProcedure
     .input(
       z.object({
-        userId: z.string(),
         query: z.string(),
         videoTitle: z.string(),
         videoUrl: z.string(),
       }),
     )
-    .mutation(async ({ input }) => {
-      await db.insert(searchHistoryTable).values({ ...input })
+    .mutation(async ({ input, ctx }) => {
+      if (!ctx.user) return
+
+      await db
+        .insert(searchHistoryTable)
+        .values({ ...input, userId: ctx.user?.id ?? "" })
     }),
 
-  getSearchHistory: publicProcedure.query(async () => {
+  getSearchHistory: publicProcedure.query(async ({ ctx }) => {
+    if (!ctx.user) return { searchHistory: [] }
+
     const searchHistory = await db
       .select()
       .from(searchHistoryTable)
-      .where(eq(searchHistoryTable.userId, "userId"))
+      .where(eq(searchHistoryTable.userId, ctx.user.id ?? ""))
       .limit(20)
 
     return { searchHistory }

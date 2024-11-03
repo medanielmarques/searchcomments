@@ -22,7 +22,7 @@ export const videoContentRouter = createTRPCRouter({
       }),
     )
     .query(async ({ input, ctx }) => {
-      await rateLimit({ ip: ctx.userIp })
+      await rateLimit({ ip: ctx.user.ip })
 
       if (shouldUseMockedData(input)) {
         return {
@@ -39,7 +39,7 @@ export const videoContentRouter = createTRPCRouter({
   getVideoInfo: publicProcedure
     .input(z.object({ videoId: z.string() }))
     .query(async ({ input, ctx }) => {
-      await rateLimit({ ip: ctx.userIp, rateLimit: 3 })
+      await rateLimit({ ip: ctx.user.ip, rateLimit: 3 })
 
       if (shouldUseMockedData(input)) {
         return mockedVideo
