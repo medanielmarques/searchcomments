@@ -10,11 +10,14 @@ export const supabaseServer = createClient(
 )
 
 export async function signInWithMagicLink(email: string) {
+  const baseUrl =
+    process.env.NEXT_PUBLIC_BASE_URL || `https://${process.env.VERCEL_URL}`
+
   await supabase.auth.signInWithOtp({
     email,
     options: {
       shouldCreateUser: true,
-      emailRedirectTo: "http://localhost:3001",
+      emailRedirectTo: baseUrl,
     },
   })
 }
