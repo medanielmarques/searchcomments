@@ -139,7 +139,7 @@ function Video() {
         <div className="relative w-full min-w-72">
           <Input
             type="text"
-            placeholder="Video URL"
+            placeholder="YouTube Video URL"
             onKeyDown={handleKeyDown}
             value={videoUrl}
             onChange={(e) => videoActions.setVideoUrl(e.target.value)}
