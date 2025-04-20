@@ -66,9 +66,9 @@ export function Header() {
 
 function Logo() {
   return (
-    <p className="font-bold text-gray-800 dark:text-gray-200 sm:text-2xl">
+    <p className="font-bold sm:text-2xl">
       search
-      <span className="mx-[2px] rounded-md bg-gray-800 px-1 text-white dark:bg-gray-200 dark:text-gray-800 sm:px-2">
+      <span className="mx-[2px] rounded-md bg-accent-foreground px-1 text-muted sm:px-2">
         comments
       </span>
       <span className="text-sm sm:text-xl">.com</span>

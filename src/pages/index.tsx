@@ -147,13 +147,13 @@ function Video() {
           />
 
           <div
-            className="absolute right-0 top-0 rounded-md bg-gray-100 hover:cursor-pointer hover:bg-gray-200 dark:bg-zinc-800 sm:dark:bg-inherit md:bg-inherit"
+            className="absolute right-0 top-0 rounded-md hover:cursor-pointer hover:bg-muted"
             onClick={handleVideoClick}
           >
             {isLoadingVideo ? (
               <ReloadIcon className="m-2.5 h-4 w-4 animate-spin" />
             ) : (
-              <MagnifyingGlassIcon className="m-2.5 h-4 w-4 text-muted-foreground dark:text-zinc-200" />
+              <MagnifyingGlassIcon className="m-2.5 h-4 w-4 text-muted-foreground" />
             )}
           </div>
         </div>
@@ -264,13 +264,13 @@ function SearchComments() {
         />
 
         <div
-          className="absolute right-0 top-0 rounded-md bg-gray-100 hover:cursor-pointer hover:bg-gray-200 dark:bg-zinc-800 sm:dark:bg-inherit md:bg-inherit"
+          className="absolute right-0 top-0 rounded-md hover:cursor-pointer hover:bg-muted"
           onClick={handleCommentClick}
         >
           {isLoadingComments ? (
             <ReloadIcon className="m-2.5 h-4 w-4 animate-spin" />
           ) : (
-            <MagnifyingGlassIcon className="m-2.5 h-4 w-4 text-muted-foreground dark:text-zinc-200" />
+            <MagnifyingGlassIcon className="m-2.5 h-4 w-4 text-muted-foreground" />
           )}
         </div>
       </div>
@@ -321,7 +321,7 @@ function SearchSuggestions() {
     <div className="flex flex-wrap items-center gap-3">
       {searchSuggestions.map(({ suggestion, selected }) => (
         <Button
-          className={`h-8 rounded-lg ${selected && "bg-black text-white hover:bg-black dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-100"} text-sm font-semibold`}
+          className={`h-8 rounded-lg ${selected && "bg-accent-foreground text-background hover:bg-accent-foreground"} text-sm font-semibold`}
           key={suggestion}
           variant="secondary"
           onClick={() => handleSuggestionClick(suggestion)}

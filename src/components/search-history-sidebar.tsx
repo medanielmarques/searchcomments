@@ -1,3 +1,4 @@
+import { Button } from "@/components/ui/button"
 import { Separator } from "@/components/ui/separator"
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar"
 import {
@@ -170,16 +171,15 @@ function TwitterLink() {
 
 function RequestFeatureLink() {
   return (
-    <>
+    <Button variant="outline">
       <Link
         onClick={() => captureEvent({ event: "Insigh.to" })}
         href="https://insigh.to/b/searchcomments"
         target="_blank"
-        className="h-9 items-center space-x-2 rounded-md border border-gray-300 px-3 py-2 text-sm font-medium transition-colors hover:bg-gray-100 dark:hover:bg-accent"
         title="Request a feature"
       >
         Feature request
       </Link>
-    </>
+    </Button>
   )
 }
