@@ -5,8 +5,8 @@ import { api } from "@/utils/api"
 import { supabase } from "@/utils/supabase"
 import { SessionContextProvider } from "@supabase/auth-helpers-react"
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools"
+import { GeistMono } from "geist/font/mono"
 import { type AppType } from "next/app"
-import { Montserrat } from "next/font/google"
 import posthog from "posthog-js"
 import { PostHogProvider } from "posthog-js/react"
 
@@ -21,14 +21,12 @@ if (isProduction && typeof window !== "undefined") {
   })
 }
 
-const montserrat = Montserrat({ subsets: ["latin"] })
-
 const MyApp: AppType = ({ Component, pageProps }) => {
   return (
     <PostHogProvider>
       <ReactQueryDevtools initialIsOpen={false} />
 
-      <main className={montserrat.className}>
+      <main className={GeistMono.className}>
         <ThemeProvider
           attribute="class"
           defaultTheme="system"
