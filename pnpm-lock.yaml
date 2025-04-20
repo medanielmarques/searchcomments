@@ -80,6 +80,9 @@ dependencies:
   framer-motion:
     specifier: ^11.1.7
     version: 11.1.7(react-dom@18.2.0)(react@18.2.0)
+  geist:
+    specifier: ^1.3.1
+    version: 1.3.1(next@14.2.3)
   googleapis:
     specifier: ^136.0.0
     version: 136.0.0
@@ -3920,6 +3923,14 @@ packages:
     transitivePeerDependencies:
       - encoding
       - supports-color
+    dev: false
+
+  /geist@1.3.1(next@14.2.3):
+    resolution: {integrity: sha512-Q4gC1pBVPN+D579pBaz0TRRnGA4p9UK6elDY/xizXdFk/g4EKR5g0I+4p/Kj6gM0SajDBZ/0FvDV9ey9ud7BWw==}
+    peerDependencies:
+      next: '>=13.2.0'
+    dependencies:
+      next: 14.2.3(react-dom@18.2.0)(react@18.2.0)
     dev: false
 
   /get-intrinsic@1.2.4:
