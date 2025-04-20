@@ -13,7 +13,7 @@ import { useIsMobile } from "@/hooks/use-mobile"
 import { cn } from "@/lib/utils"
 import { Slot } from "@radix-ui/react-slot"
 import { VariantProps, cva } from "class-variance-authority"
-import { PanelLeft } from "lucide-react"
+import { ChevronRight } from "lucide-react"
 import * as React from "react"
 
 const SIDEBAR_COOKIE_NAME = "sidebar:state"
@@ -284,7 +284,7 @@ const SidebarTrigger = React.forwardRef<
       }}
       {...props}
     >
-      <PanelLeft />
+      <ChevronRight />
       <span className="sr-only">Toggle Sidebar</span>
     </Button>
   )

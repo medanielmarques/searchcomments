@@ -42,7 +42,8 @@ export function AppSidebar() {
       <SidebarContent>
         <SidebarGroup className="h-screen">
           <SidebarGroupLabel>Search history</SidebarGroupLabel>
-          <SidebarGroupContent className="flex h-full flex-col justify-between">
+
+          <SidebarGroupContent className="mt-4 flex h-full flex-col justify-between">
             {session?.user.email ? (
               <div className="flex flex-col gap-4">
                 {data?.searchHistory.map((search) => (
@@ -62,15 +63,13 @@ export function AppSidebar() {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col gap-4">
+              <div className="flex flex-col gap-4 text-center">
                 Sign in to see your search history
               </div>
             )}
 
-            <Separator />
-
             {/* Sidebar Footer */}
-            <div className="flex flex-col items-center gap-2">
+            <div className="border-muted-foreground/2 flex flex-col items-center gap-2 border-t py-4">
               <div className="flex items-center gap-2">
                 <BuyMeACoffeeLink />
                 <TwitterLink />
