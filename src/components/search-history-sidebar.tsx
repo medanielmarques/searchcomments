@@ -70,9 +70,12 @@ export function AppSidebar() {
 
             {/* Sidebar Footer */}
             <div className="border-muted-foreground/2 flex flex-col items-center gap-2 border-t py-4">
-              <div className="flex items-center gap-2">
-                <BuyMeACoffeeLink />
-                <TwitterLink />
+              <div className="flex flex-col items-center gap-3">
+                <div className="flex items-center gap-2">
+                  <BuyMeACoffeeLink />
+                  <TwitterLink />
+                </div>
+
                 <RequestFeatureLink />
               </div>
             </div>
