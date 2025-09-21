@@ -196,14 +196,11 @@ function Video() {
 }
 
 function SearchComments() {
-  const { video } = useVideo()
   const { isLoadingComments } = useComments()
   const searchTerms = useSearchTerms()
   const videoActions = useActions()
   const videoId = useVideoId()
-  const videoUrl = useVideoUrl()
   const utils = api.useUtils()
-  const { mutate } = api.searchRouter.saveSearch.useMutation()
 
   const searchCommentsInputRef = useRef<HTMLInputElement>(null)
 
@@ -220,12 +217,6 @@ function SearchComments() {
 
   async function handleCommentClick() {
     if (process.env.NODE_ENV === "production" && searchTerms === "") return
-
-    mutate({
-      query: searchTerms,
-      videoTitle: video?.title ?? "",
-      videoUrl,
-    })
 
     await utils.videoContentRouter.getVideoComments.fetchInfinite({
       videoId,
