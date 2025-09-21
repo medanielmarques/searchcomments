@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { useCommentsInfiniteScrolling } from "@/hooks/use-comments-infinite-scrolling"
-import { captureEvent } from "@/lib/analytics"
 import {
   useActions,
   useCommentId,
@@ -235,16 +234,6 @@ function SearchComments() {
       videoId,
       searchTerms,
     })
-
-    captureEvent({
-      event: "Video + search term",
-      user: {},
-      properties: {
-        videoTitle: video?.title,
-        videoUrl,
-        searchTerms,
-      },
-    })
   }
 
   return (
@@ -301,17 +290,6 @@ function SearchSuggestions() {
     })
 
     videoActions.setSearchSuggestions(newSuggestions)
-
-    captureEvent({
-      event: "Search suggestions",
-      user: {},
-      properties: {
-        videoTitle: video?.title,
-        videoUrl,
-        searchTerms,
-        suggestion,
-      },
-    })
   }
 
   return (
@@ -362,17 +340,6 @@ function Comment({ comment }: { comment: Comment }) {
       commentId: [comment.comment.id],
       searchTerms: "",
       includeReplies: true,
-    })
-
-    captureEvent({
-      event: "User clicked to Show replies",
-      user: {},
-      properties: {
-        videoTitle: video?.title,
-        videoUrl,
-        searchTerms,
-        commentId: comment.comment.id,
-      },
     })
   }
 
