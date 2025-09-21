@@ -17,7 +17,6 @@ import {
 import { type Comment } from "@/server/api/use-cases/fetch-comments"
 import { api } from "@/utils/api"
 import { MagnifyingGlassIcon, ReloadIcon } from "@radix-ui/react-icons"
-import { useSession } from "@supabase/auth-helpers-react"
 import { formatDistanceStrict } from "date-fns"
 import Image from "next/image"
 import Link from "next/link"
@@ -205,7 +204,6 @@ function SearchComments() {
   const videoUrl = useVideoUrl()
   const utils = api.useUtils()
   const { mutate } = api.searchRouter.saveSearch.useMutation()
-  const session = useSession()
 
   const searchCommentsInputRef = useRef<HTMLInputElement>(null)
 
@@ -223,12 +221,11 @@ function SearchComments() {
   async function handleCommentClick() {
     if (process.env.NODE_ENV === "production" && searchTerms === "") return
 
-    session?.user.email &&
-      mutate({
-        query: searchTerms,
-        videoTitle: video?.title ?? "",
-        videoUrl,
-      })
+    mutate({
+      query: searchTerms,
+      videoTitle: video?.title ?? "",
+      videoUrl,
+    })
 
     await utils.videoContentRouter.getVideoComments.fetchInfinite({
       videoId,

@@ -6,8 +6,6 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
-import { getUser } from "@/utils/supabase"
-import { User } from "@supabase/supabase-js"
 import { initTRPC } from "@trpc/server"
 import { type CreateNextContextOptions } from "@trpc/server/adapters/next"
 import superjson from "superjson"
@@ -21,9 +19,7 @@ import { ZodError } from "zod"
  * These allow you to access things when processing a request, like the database, the session, etc.
  */
 
-type CreateContextOptions =
-  | Record<string, never>
-  | { user: User | null; userIp: string }
+type CreateContextOptions = Record<string, never> | { userIp: string }
 
 /**
  * This helper generates the "internals" for a tRPC context. If you need to use it, you can export
@@ -37,10 +33,7 @@ type CreateContextOptions =
  */
 const createInnerTRPCContext = async (_opts: CreateContextOptions) => {
   return {
-    user: {
-      ..._opts.user,
-      ip: _opts.userIp,
-    },
+    ip: _opts.userIp,
   }
 }
 
@@ -53,9 +46,7 @@ const createInnerTRPCContext = async (_opts: CreateContextOptions) => {
 export const createTRPCContext = async (_opts: CreateNextContextOptions) => {
   const userIp = _opts.req.headers["x-forwarded-for"] as string
 
-  const user = await getUser(_opts.req)
-
-  return createInnerTRPCContext({ user, userIp })
+  return createInnerTRPCContext({ userIp })
 }
 
 /**
