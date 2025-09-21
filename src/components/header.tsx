@@ -33,32 +33,7 @@ export function Header() {
       <div className="flex w-full max-w-2xl items-center justify-between gap-4 px-2 py-2 sm:gap-0 sm:px-0">
         <Logo />
 
-        <div className="flex gap-2">
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button>{session?.user.email ? "Sign out" : "Sign in"}</Button>
-            </PopoverTrigger>
-
-            <PopoverContent className="flex flex-col gap-3 p-4">
-              <Input
-                type="email"
-                className="text-center"
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="E-mail"
-                autoComplete="email"
-                name="email"
-              />
-              <Button
-                onClick={handleClickSignIn}
-                className="flex items-center gap-2"
-              >
-                <PaperPlaneIcon /> Send magic link
-              </Button>
-            </PopoverContent>
-          </Popover>
-
-          <ToggleThemeButton />
-        </div>
+        <ToggleThemeButton />
       </div>
     </header>
   )
@@ -67,11 +42,9 @@ export function Header() {
 function Logo() {
   return (
     <p className="font-bold text-gray-800 dark:text-gray-200 sm:text-2xl">
-      search
       <span className="mx-[2px] rounded-md bg-gray-800 px-1 text-white dark:bg-gray-200 dark:text-gray-800 sm:px-2">
-        comments
+        searchcomments.com
       </span>
-      <span className="text-sm sm:text-xl">.com</span>
     </p>
   )
 }

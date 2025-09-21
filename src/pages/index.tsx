@@ -1,5 +1,4 @@
 import { Header } from "@/components/header"
-import { SearchHistorySidebar } from "@/components/search-history-sidebar"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -57,8 +56,6 @@ export default function Home() {
 
   return (
     <div className="flex">
-      <SearchHistorySidebar />
-
       <div className="mx-auto">
         <Header />
 
