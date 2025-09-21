@@ -1,4 +1,3 @@
-import { searchRouter } from "@/server/api/routers/search"
 import { videoContentRouter } from "@/server/api/routers/video-content"
 import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc"
 
@@ -9,7 +8,6 @@ import { createCallerFactory, createTRPCRouter } from "@/server/api/trpc"
  */
 export const appRouter = createTRPCRouter({
   videoContentRouter,
-  searchRouter,
 })
 
 // export type definition of API
